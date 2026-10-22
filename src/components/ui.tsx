@@ -2,24 +2,26 @@ import type { ReactNode } from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { C, F, TEXTURES } from '@/lib/theme';
+import { F, TEXTURES, useC, type TextureKey } from '@/lib/theme';
 
 type TxtProps = TextProps & { f?: keyof typeof F; size?: number; color?: string; caps?: boolean; track?: number; style?: StyleProp<TextStyle> };
 
 // Texto na tipografia do app. caps + track dão o visual de etiqueta (maiúsculas espaçadas).
-export function Txt({ f = 'med', size = 16, color = C.fg, caps, track, style, ...rest }: TxtProps) {
+export function Txt({ f = 'med', size = 16, color, caps, track, style, ...rest }: TxtProps) {
+  const C = useC();
   return (
     <Text
       {...rest}
-      style={[{ fontFamily: F[f], fontSize: size, color, letterSpacing: track ? size * track : undefined, textTransform: caps ? 'uppercase' : 'none' }, style]}
+      style={[{ fontFamily: F[f], fontSize: size, color: color ?? C.fg, letterSpacing: track ? size * track : undefined, textTransform: caps ? 'uppercase' : 'none' }, style]}
     />
   );
 }
 
 // Fundo de tecido de kimono, na cor da fase.
-export function Fabric({ tone = 'escuro', children, style }: { tone?: keyof typeof TEXTURES; children: ReactNode; style?: StyleProp<ViewStyle> }) {
+export function Fabric({ tone, children, style }: { tone?: TextureKey; children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const C = useC();
   return (
-    <ImageBackground source={TEXTURES[tone]} resizeMode="cover" style={[{ flex: 1, backgroundColor: C.ground }, style]}>
+    <ImageBackground source={TEXTURES[tone ?? C.fabric]} resizeMode="cover" imageStyle={{ width: "100%", height: "100%" }} style={[{ flex: 1, backgroundColor: C.ground }, style]}>
       {children}
     </ImageBackground>
   );
@@ -35,19 +37,22 @@ export function Screen({ children, scroll }: { children: ReactNode; scroll?: boo
 }
 
 export function Panel({ children, style, stitch }: { children: ReactNode; style?: StyleProp<ViewStyle>; stitch?: boolean }) {
+  const C = useC();
   return (
-    <View style={[s.panel, style]}>
-      {stitch && <View pointerEvents="none" style={s.stitch} />}
+    <View style={[s.panel, { backgroundColor: C.panel }, style]}>
+      {stitch && <View pointerEvents="none" style={[s.stitch, { borderColor: C.stitch }]} />}
       {children}
     </View>
   );
 }
 
-export function Label({ children, color = C.muted, size = 14 }: { children: ReactNode; color?: string; size?: number }) {
-  return <Txt f="med" size={size} color={color} caps track={0.13}>{children}</Txt>;
+export function Label({ children, color, size = 14 }: { children: ReactNode; color?: string; size?: number }) {
+  const C = useC();
+  return <Txt f="med" size={size} color={color ?? C.muted} caps track={0.13}>{children}</Txt>;
 }
 
 export function PrimaryButton({ label, onPress, icon, height = 64, light = true }: { label: string; onPress: () => void; icon?: ReactNode; height?: number; light?: boolean }) {
+  const C = useC();
   return (
     <Pressable
       accessibilityRole="button"
@@ -59,27 +64,29 @@ export function PrimaryButton({ label, onPress, icon, height = 64, light = true 
   );
 }
 
-export function IconButton({ onPress, label, children, size = 44, border = 'rgba(243,241,234,.25)' }: { onPress: () => void; label: string; children: ReactNode; size?: number; border?: string }) {
+export function IconButton({ onPress, label, children, size = 44, border }: { onPress: () => void; label: string; children: ReactNode; size?: number; border?: string }) {
+  const C = useC();
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={6}
-      style={({ pressed }) => ({ width: size, height: size, borderRadius: size / 2, borderWidth: 1, borderColor: border, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
+      style={({ pressed }) => ({ width: size, height: size, borderRadius: size / 2, borderWidth: 1, borderColor: border ?? C.ring, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
       {children}
     </Pressable>
   );
 }
 
 // Valor grande com rótulo pequeno embaixo (tempos, contagens).
-export function Stat({ value, label, color = C.fg, size = 22, align = 'center' }: { value: string; label: string; color?: string; size?: number; align?: 'center' | 'flex-start' }) {
+export function Stat({ value, label, color, size = 22, align = 'center' }: { value: string; label: string; color?: string; size?: number; align?: 'center' | 'flex-start' }) {
+  const C = useC();
   return (
     <View style={{ alignItems: align, gap: 3, flex: 1 }}>
-      <Txt f="numMed" size={size} color={color}>{value}</Txt>
+      <Txt f="numMed" size={size} color={color ?? C.fg}>{value}</Txt>
       <Txt f="med" size={12} color={C.muted} caps track={0.1}>{label}</Txt>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  panel: { backgroundColor: C.panel, borderRadius: 16, padding: 16 },
-  stitch: { position: 'absolute', top: 7, left: 7, right: 7, bottom: 7, borderRadius: 11, borderWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(255,255,255,.10)' },
+  panel: { borderRadius: 16, padding: 16 },
+  stitch: { position: 'absolute', top: 7, left: 7, right: 7, bottom: 7, borderRadius: 11, borderWidth: 1, borderStyle: 'dashed' },
   primary: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
 });

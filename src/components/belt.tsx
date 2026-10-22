@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-import { BELTS, type BeltKey } from '@/lib/theme';
+import { BELTS, useC, type BeltKey } from '@/lib/theme';
 
 const STRIPE = '#f3f1ea';
 
@@ -11,6 +11,7 @@ export function Belt({ belt, degrees = 0, height = 30, width, fill, rounds, roun
   belt: BeltKey; degrees?: number; height?: number; width?: number | `${number}%`;
   fill?: number; rounds?: number; roundsDone?: number; current?: string; small?: boolean;
 }) {
+  const C = useC();
   const b = BELTS[belt];
   const progress = fill !== undefined;
   const count = progress ? Math.min(rounds ?? 0, 8) : degrees;
@@ -24,7 +25,7 @@ export function Belt({ belt, degrees = 0, height = 30, width, fill, rounds, roun
   const tipW = small ? 26 : Math.max(70, count * (stripeW + 7) + 18);
   return (
     <View style={{ height, width: width ?? '100%', borderRadius: small ? 3 : 6, overflow: 'hidden',
-      backgroundColor: progress ? 'rgba(243,241,234,.08)' : b.color, borderWidth: progress ? 1 : 0, borderColor: 'rgba(243,241,234,.18)' }}>
+      backgroundColor: progress ? 'rgba(243,241,234,.08)' : b.color, borderWidth: progress || !C.dark ? 1 : 0, borderColor: progress ? 'rgba(243,241,234,.18)' : 'rgba(0,0,0,.14)' }}>
       {progress && <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(1, fill!)) * 100}%`, backgroundColor: b.color }} />}
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: Math.max(3, height * 0.13), backgroundColor: 'rgba(0,0,0,.22)' }} />
       <View style={{ position: 'absolute', right: small ? 8 : height * 0.6, top: 0, bottom: 0, width: tipW, backgroundColor: b.tip,

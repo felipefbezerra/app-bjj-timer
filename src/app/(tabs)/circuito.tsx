@@ -8,14 +8,15 @@ import { Label, Panel, PrimaryButton, Screen, Stat, Txt } from '@/components/ui'
 import { newRun, setPendingRun } from '@/lib/runner';
 import { buildSequence, fmtClock, totalSeconds, type CircuitoConfig, type Station } from '@/lib/sequence';
 import { useStore } from '@/lib/store';
-import { BELTS, C, F } from '@/lib/theme';
+import { beltLook, F, useC } from '@/lib/theme';
 
 type StationEdit = { index: number; st: Station };
 
 export default function Circuito() {
   const store = useStore();
   const c = store.circuito;
-  const b = BELTS[store.profile.belt];
+  const C = useC();
+  const b = beltLook(store.profile.belt, C);
   const [times, setTimes] = useState<CircuitoConfig | null>(null);
   const [station, setStation] = useState<StationEdit | null>(null);
 
