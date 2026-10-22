@@ -27,6 +27,14 @@ npx expo start
 > No Expo Go ele pode se comportar diferente. Para testar isso, gere um build de desenvolvimento com
 > `npx expo run:android` / `npx expo run:ios` ou com o EAS Build.
 
+## APK para Android
+
+A cada mudança no `main`, o GitHub Actions gera um APK de teste e publica em
+[Releases](https://github.com/felipefbezerra/app-bjj-timer/releases).
+No celular Android, abra a release mais recente, baixe o `bjj-timer.apk` e toque nele para instalar
+(o Android pede para permitir a instalação de apps de fora da Play Store).
+Para gerar na hora, use **Actions → APK Android → Run workflow**.
+
 ## Estrutura
 
 ```
