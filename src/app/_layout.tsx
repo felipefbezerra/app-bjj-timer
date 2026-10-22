@@ -5,15 +5,18 @@ import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
 
 import { RunStore, setPendingRun } from '@/lib/runner';
 import { StoreProvider, useStore } from '@/lib/store';
-import { C } from '@/lib/theme';
+import { DARK, LIGHT, ThemeCtx } from '@/lib/theme';
 
 SplashScreen.preventAutoHideAsync();
 
 function Gate() {
-  const { ready } = useStore();
+  const { ready, theme } = useStore();
+  const system = useColorScheme();
+  const C = (theme === 'auto' ? system === 'light' : theme === 'light') ? LIGHT : DARK;
   const [fonts] = useFonts({
     BarlowCondensed_400Regular, BarlowCondensed_500Medium, BarlowCondensed_600SemiBold, BarlowCondensed_700Bold,
     Oswald_500Medium, Oswald_600SemiBold,
@@ -29,17 +32,19 @@ function Gate() {
 
   if (!ok) return null;
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.ground } }}>
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="treino" options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: 'fade' }} />
-    </Stack>
+    <ThemeCtx.Provider value={C}>
+      <StatusBar style={C.dark ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.ground } }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="treino" options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: 'fade', contentStyle: { backgroundColor: DARK.ground } }} />
+      </Stack>
+    </ThemeCtx.Provider>
   );
 }
 
 export default function RootLayout() {
   return (
     <StoreProvider>
-      <StatusBar style="light" />
       <Gate />
     </StoreProvider>
   );

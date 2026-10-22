@@ -44,3 +44,8 @@ export const IconFlame = ({ color = '#fff', size = 26 }: P) => (
 export const IconHandle = ({ color = '#9a9ea4', size = 20 }: P) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}><Path d="M5 9h14M5 15h14" /></Svg>
 );
+export const IconPip = ({ color = '#fff', size = 20 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8}>
+    <Rect x={2.5} y={4.5} width={19} height={15} rx={2} /><Rect x={12} y={11.5} width={7} height={5} rx={1} fill={color} />
+  </Svg>
+);

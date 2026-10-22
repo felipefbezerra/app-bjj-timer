@@ -9,7 +9,13 @@ Roda em Android e iPhone com o mesmo código. **App em construção**, ainda nã
 - **Circuito**: estações com nome e tempo, troca, voltas e descanso entre voltas.
 - **Cronômetro**: com voltas.
 - **Treinos**: perfil (nome, faixa, graus), meta da semana, sequência, calendário do mês e últimos treinos.
+  Dá para registrar à mão um treino feito sem o app (aula, rola, drill, circuito, competição) e excluir qualquer treino tocando nele.
 - **Treino em andamento**: a cor e o tecido mudam por fase, a faixa enche conforme as rondas, voz em português, bipes e vibração.
+  Funciona em pé e deitado.
+- **Segundo plano**: no Android, um serviço com notificação (fase, tempo e progresso) mantém o treino contando e falando
+  com outro app aberto, e a janelinha flutuante abre sozinha quando você sai do app (ou pelo botão na tela do treino).
+  No iPhone, o modo de áudio em segundo plano mantém o treino rodando.
+- **Tema claro e escuro**: em Ajustes, Automático (segue o celular), Claro ou Escuro.
 - O tempo usa a hora real. Se o sistema congelar o app, ele desconta certo quando volta, e o treino é retomado se o app for fechado.
 - Tudo fica salvo no próprio aparelho (AsyncStorage), sem banco de dados.
 
@@ -42,7 +48,9 @@ src/app/            telas (expo-router)
   (tabs)/           Combate, Circuito, Cronômetro, Treinos
   treino.tsx        tela do treino em andamento
 src/components/     peças de interface (faixa, painéis, ícones, folhas)
-src/lib/            regras: sequência de fases, relógio, som/voz, dados salvos, cores
+src/lib/            regras: sequência de fases, relógio, som/voz, segundo plano, dados salvos, cores
+modules/timer-pip/  módulo nativo (Android) da janelinha flutuante
+plugins/            ajustes nativos do Android (serviço, janelinha, ícone da notificação)
 assets/textures/    tecido do tatame em cada cor
 assets/sounds/      bipes e o áudio silencioso que mantém o app vivo em segundo plano
 ```
@@ -58,4 +66,4 @@ npx eslint .
 
 - Ícone e tela de abertura próprios (hoje são os do modelo do Expo).
 - Relatório semanal e registro manual de treinos.
-- No Android, um serviço em primeiro plano para garantir o áudio em segundo plano junto com outros apps.
+- No iPhone, a janelinha equivalente seria uma Live Activity (tela de bloqueio e Dynamic Island).

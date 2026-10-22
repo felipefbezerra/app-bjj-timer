@@ -4,7 +4,7 @@ import Svg, { Circle } from 'react-native-svg';
 
 import { Label, PrimaryButton, Screen, Txt } from '@/components/ui';
 import { useStore } from '@/lib/store';
-import { BELTS, C } from '@/lib/theme';
+import { beltLook, useC } from '@/lib/theme';
 
 function fmt(ms: number) {
   const t = Math.floor(ms / 100);
@@ -15,7 +15,8 @@ function fmt(ms: number) {
 const R = 132, LEN = 2 * Math.PI * R;
 
 export default function Cronometro() {
-  const accent = BELTS[useStore().profile.belt].accent;
+  const C = useC();
+  const accent = beltLook(useStore().profile.belt, C).accent;
   // Hora real: continua certo mesmo se o app ficar em segundo plano.
   const [acc, setAcc] = useState(0);
   const [start, setStart] = useState<number | null>(null);

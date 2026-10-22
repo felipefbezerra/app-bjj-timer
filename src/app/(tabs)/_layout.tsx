@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { IconCircuito, IconCombate, IconCronometro, IconTreinos } from '@/components/icons';
 import { Txt } from '@/components/ui';
-import { C } from '@/lib/theme';
+import { useC } from '@/lib/theme';
 
 const TABS = {
   index: { label: 'Combate', Icon: IconCombate },
@@ -16,8 +16,9 @@ const TABS = {
 
 function TabBar({ state, navigateToTab }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const C = useC();
   return (
-    <View style={{ flexDirection: 'row', paddingTop: 10, paddingBottom: Math.max(14, insets.bottom), paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: C.line, backgroundColor: 'rgba(17,19,21,.96)' }}>
+    <View style={{ flexDirection: 'row', paddingTop: 10, paddingBottom: Math.max(14, insets.bottom), paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.bar }}>
       {state.routes.map((route, i) => {
         const t = TABS[route.name as keyof typeof TABS];
         if (!t) return null;
@@ -36,6 +37,7 @@ function TabBar({ state, navigateToTab }: BottomTabBarProps) {
 }
 
 export default function TabsLayout() {
+  const C = useC();
   return (
     <Tabs tabBar={props => <TabBar {...props} />} screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: C.ground } }}>
       <Tabs.Screen name="index" />

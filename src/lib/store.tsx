@@ -6,12 +6,15 @@ import { DEFAULT_CIRCUITO, type CircuitoConfig, type CombateConfig, type Mode } 
 
 export type Profile = { name: string; belt: BeltKey; degrees: number };
 export type SoundMode = 'voice' | 'beep' | 'mute';
-export type Session = { t: number; mode: Mode; work: number; rounds: number; themes: string[]; done: boolean; label: string };
+export type ThemeMode = 'auto' | 'light' | 'dark';
+// manual: treino registrado à mão na aba Treinos (aula, rola etc.), sem usar o temporizador.
+export type Session = { t: number; mode: Mode; work: number; rounds: number; themes: string[]; done: boolean; label: string; manual?: boolean };
 export type PresetId = 'aula' | 'competicao' | 'rola' | 'posicao' | 'custom';
 
 type Data = {
   profile: Profile;
   sound: SoundMode;
+  theme: ThemeMode;
   weeklyGoal: number;
   preset: PresetId;
   custom: CombateConfig;
@@ -22,6 +25,7 @@ type Data = {
 const DEFAULTS: Data = {
   profile: { name: '', belt: 'branca', degrees: 0 },
   sound: 'voice',
+  theme: 'auto',
   weeklyGoal: 4,
   preset: 'aula',
   custom: { prep: 10, work: 300, rest: 60, rounds: 5, relax: 0, themes: [], themeOrder: 'seq' },
@@ -88,6 +92,3 @@ export function useStore() {
   if (!s) throw new Error('useStore fora do StoreProvider');
   return s;
 }
-
-export function accentOf(p: Profile) { return BELTS[p.belt].accent; }
-export function inkOf(p: Profile) { return BELTS[p.belt].ink; }

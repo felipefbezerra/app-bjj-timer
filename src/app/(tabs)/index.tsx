@@ -9,11 +9,12 @@ import { Label, Panel, PrimaryButton, Screen, Stat, Txt } from '@/components/ui'
 import { newRun, setPendingRun } from '@/lib/runner';
 import { buildSequence, fmtClock, totalSeconds, type CombateConfig } from '@/lib/sequence';
 import { presetsFor, useStore } from '@/lib/store';
-import { BELTS, C } from '@/lib/theme';
+import { beltLook, useC } from '@/lib/theme';
 
 export default function Combate() {
   const st = useStore();
-  const b = BELTS[st.profile.belt];
+  const C = useC();
+  const b = beltLook(st.profile.belt, C);
   const presets = presetsFor(st.profile.belt, st.custom);
   const sel = presets.find(p => p.id === st.preset) ?? presets[0];
   const c = sel.config;
@@ -51,7 +52,7 @@ export default function Combate() {
             return (
               <Pressable key={p.id} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => st.set({ preset: p.id })}
                 style={{ width: '48.5%', minHeight: 150, borderRadius: 16, padding: 16, gap: 10, backgroundColor: on ? b.accent : C.panel }}>
-                <View pointerEvents="none" style={{ position: 'absolute', top: 7, left: 7, right: 7, bottom: 7, borderRadius: 11, borderWidth: 1, borderStyle: 'dashed', borderColor: on ? 'rgba(0,0,0,.18)' : 'rgba(255,255,255,.10)' }} />
+                <View pointerEvents="none" style={{ position: 'absolute', top: 7, left: 7, right: 7, bottom: 7, borderRadius: 11, borderWidth: 1, borderStyle: 'dashed', borderColor: on ? 'rgba(0,0,0,.18)' : C.stitch }} />
                 <Txt f="semi" size={13} color={on ? b.ink : C.muted} caps track={0.12}>{p.kicker}</Txt>
                 <Txt f="num" size={40} color={on ? b.ink : C.fg} style={{ lineHeight: 46 }}>{p.big}</Txt>
                 <View style={{ marginTop: 'auto' }}>
