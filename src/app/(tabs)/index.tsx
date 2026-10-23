@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Belt } from '@/components/belt';
 import { IconPlay } from '@/components/icons';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
-import { Label, Panel, PrimaryButton, Screen, Stat, Txt } from '@/components/ui';
+import { Label, Panel, PrimaryButton, Screen, Split, Stat, Txt, useWide } from '@/components/ui';
 import { newRun, setPendingRun } from '@/lib/runner';
 import { Sound } from '@/lib/sound';
 import { buildSequence, fmtClock, totalSeconds, type CombateConfig } from '@/lib/sequence';
@@ -20,6 +20,7 @@ export default function Combate() {
   const sel = presets.find(p => p.id === st.preset) ?? presets[0];
   const c = sel.config;
   const [edit, setEdit] = useState<CombateConfig | null>(null);
+  const wide = useWide();
 
   const start = () => {
     const seq = buildSequence('combate', c);
@@ -34,7 +35,7 @@ export default function Combate() {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+      <Split left={<>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10 }}>
           <View style={{ gap: 2 }}>
             <Label size={15}>{greeting}</Label>
@@ -65,8 +66,8 @@ export default function Combate() {
             );
           })}
         </View>
-
-        <Panel style={{ marginHorizontal: 20, marginTop: 10, gap: 12 }}>
+      </>} right={<>
+        <Panel style={{ marginHorizontal: 20, marginLeft: wide ? 0 : 20, marginTop: wide ? 18 : 10, gap: 12 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Label>{sel.kicker} {sel.big}</Label>
             <Pressable accessibilityRole="button" hitSlop={10} onPress={() => setEdit({ ...c })}>
@@ -86,10 +87,10 @@ export default function Combate() {
           </View>
         </Panel>
 
-        <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
+        <View style={{ paddingHorizontal: 20, paddingLeft: wide ? 0 : 20, paddingTop: 16 }}>
           <PrimaryButton label="Começar treino" icon={<IconPlay color={C.ink} />} onPress={start} />
         </View>
-      </ScrollView>
+      </>} flexLeft={1.25} />
 
       <Sheet open={!!edit} title="Ajustar treino" onClose={() => setEdit(null)}
         actions={<SheetActions onCancel={() => setEdit(null)} onOk={() => { if (edit) st.set({ custom: edit, preset: 'custom' }); setEdit(null); }} okLabel="Guardar" />}>

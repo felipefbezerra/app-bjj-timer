@@ -15,6 +15,7 @@ Roda em Android e iPhone com o mesmo código. **App em construção**, ainda nã
 - **Segundo plano**: no Android, um serviço com notificação (fase, tempo e progresso) mantém o treino contando e falando
   com outro app aberto, e a janelinha flutuante abre sozinha quando você sai do app (ou pelo botão na tela do treino).
   No iPhone, o modo de áudio em segundo plano mantém o treino rodando.
+- **Tela deitada**: com o celular deitado (ou em tablet e computador), as telas usam duas colunas e a barra de abas fica baixa.
 - **Tema claro e escuro**: em Ajustes, Automático (segue o celular), Claro ou Escuro.
 - O tempo usa a hora real. Se o sistema congelar o app, ele desconta certo quando volta, e o treino é retomado se o app for fechado.
 - Tudo fica salvo no próprio aparelho (AsyncStorage), sem banco de dados.

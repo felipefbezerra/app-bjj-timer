@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ImageBackground, Pressable, StyleSheet, Text, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
+import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { F, TEXTURES, useC, type TextureKey } from '@/lib/theme';
@@ -27,12 +27,36 @@ export function Fabric({ tone, children, style }: { tone?: TextureKey; children:
   );
 }
 
-export function Screen({ children, scroll }: { children: ReactNode; scroll?: boolean }) {
+export function Screen({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
+  // Laterais seguras para o entalhe da câmera com o celular deitado.
   return (
     <Fabric>
-      <View style={{ flex: 1, paddingTop: insets.top, paddingBottom: scroll ? 0 : 0 }}>{children}</View>
+      <View style={{ flex: 1, paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }}>{children}</View>
     </Fabric>
+  );
+}
+
+// Largura de sobra (celular deitado, tablet, computador): as telas usam duas colunas.
+export function useWide() {
+  return useWindowDimensions().width >= 600;
+}
+// Pouca altura (celular deitado): barra de abas e folhas mais baixas.
+export function useShort() {
+  return useWindowDimensions().height < 500;
+}
+
+const MAX_W = 1100;
+
+// Duas colunas que rolam separadas quando há largura; uma embaixo da outra no celular em pé.
+export function Split({ left, right, flexLeft = 1, style }: { left: ReactNode; right: ReactNode; flexLeft?: number; style?: StyleProp<ViewStyle> }) {
+  const wide = useWide();
+  if (!wide) return <ScrollView contentContainerStyle={[{ paddingBottom: 24 }, style]}>{left}{right}</ScrollView>;
+  return (
+    <View style={{ flex: 1, flexDirection: 'row', width: '100%', maxWidth: MAX_W, alignSelf: 'center' }}>
+      <ScrollView style={{ flex: flexLeft }} contentContainerStyle={[{ paddingBottom: 24 }, style]}>{left}</ScrollView>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={[{ paddingBottom: 24 }, style]}>{right}</ScrollView>
+    </View>
   );
 }
 
