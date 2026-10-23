@@ -1,21 +1,26 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, ScrollView, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useC } from '@/lib/theme';
-import { Txt } from './ui';
+import { Txt, useShort } from './ui';
 
 // Folha que sobe de baixo para editar valores.
 export function Sheet({ open, title, onClose, children, actions }: { open: boolean; title: string; onClose: () => void; children: ReactNode; actions?: ReactNode }) {
   const insets = useSafeAreaInsets();
   const C = useC();
+  // Deitado ou em tela grande, a folha não estica de ponta a ponta e ocupa quase toda a altura.
+  const short = useShort();
   return (
-    <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,.55)' }} onPress={onClose} accessibilityLabel="Fechar" />
-      <View style={{ backgroundColor: C.dark ? C.panel : '#f6f4ee', borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 20, paddingTop: 20, paddingBottom: Math.max(20, insets.bottom + 8), maxHeight: '88%', gap: 16 }}>
-        <Txt f="bold" size={24} caps track={0.02}>{title}</Txt>
-        <ScrollView contentContainerStyle={{ gap: 14 }} keyboardShouldPersistTaps="handled">{children}</ScrollView>
-        {actions}
+    <Modal visible={open} transparent animationType="slide" supportedOrientations={['portrait', 'landscape']} onRequestClose={onClose}>
+      <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,.55)' }}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Fechar" />
+        <View style={{ backgroundColor: C.dark ? C.panel : '#f6f4ee', borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 20, paddingTop: short ? 14 : 20,
+          paddingBottom: Math.max(short ? 12 : 20, insets.bottom + 8), maxHeight: short ? '94%' : '88%', gap: short ? 10 : 16, width: '100%', maxWidth: 600, alignSelf: 'center' }}>
+          <Txt f="bold" size={short ? 20 : 24} caps track={0.02}>{title}</Txt>
+          <ScrollView contentContainerStyle={{ gap: 14 }} keyboardShouldPersistTaps="handled">{children}</ScrollView>
+          {actions}
+        </View>
       </View>
     </Modal>
   );

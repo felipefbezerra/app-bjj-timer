@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Alert, Pressable, TextInput, View } from 'react-native';
 
 import { Belt } from '@/components/belt';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
-import { Label, Panel, PrimaryButton, Screen, Txt } from '@/components/ui';
+import { Label, Panel, PrimaryButton, Screen, Split, Txt, useWide } from '@/components/ui';
 import { useStore, type Profile, type Session, type SoundMode, type ThemeMode } from '@/lib/store';
 import { BELT_ORDER, BELTS, beltLook, F, useC } from '@/lib/theme';
 
@@ -32,6 +32,7 @@ export default function Treinos() {
   const [view, setView] = useState(() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() }; });
   const [draft, setDraft] = useState<Draft | null>(null);
   const [open, setOpen] = useState<{ s: Session; confirm: boolean } | null>(null);
+  const wide = useWide();
 
   const [now] = useState(() => Date.now());
   const ws = weekStart(now);
@@ -80,107 +81,111 @@ export default function Treinos() {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 18, gap: 14 }}>
-        <Panel stitch style={{ gap: 14, borderRadius: 18 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <View style={{ gap: 2, flex: 1 }}>
-              <Txt f="bold" size={32} caps numberOfLines={1}>{st.profile.name || 'Seu nome'}</Txt>
-              <Label size={15}>Faixa {b.name.toLowerCase()} · {st.profile.degrees ? `${st.profile.degrees} ${st.profile.degrees === 1 ? 'grau' : 'graus'}` : 'lisa'}</Label>
+      <Split style={{ paddingTop: 18 }} left={
+        <View style={{ paddingHorizontal: 20, gap: 14 }}>
+          <Panel stitch style={{ gap: 14, borderRadius: 18 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <View style={{ gap: 2, flex: 1 }}>
+                <Txt f="bold" size={32} caps numberOfLines={1}>{st.profile.name || 'Seu nome'}</Txt>
+                <Label size={15}>Faixa {b.name.toLowerCase()} · {st.profile.degrees ? `${st.profile.degrees} ${st.profile.degrees === 1 ? 'grau' : 'graus'}` : 'lisa'}</Label>
+              </View>
+              <Pressable accessibilityRole="button" onPress={() => setProfile({ ...st.profile, goal: st.weeklyGoal })}
+                style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: C.line2 }}>
+                <Txt f="med" size={14} caps track={0.1}>Editar perfil</Txt>
+              </Pressable>
             </View>
-            <Pressable accessibilityRole="button" onPress={() => setProfile({ ...st.profile, goal: st.weeklyGoal })}
-              style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: C.line2 }}>
-              <Txt f="med" size={14} caps track={0.1}>Editar perfil</Txt>
-            </Pressable>
-          </View>
-          <Belt belt={st.profile.belt} degrees={st.profile.degrees} height={30} />
-        </Panel>
+            <Belt belt={st.profile.belt} degrees={st.profile.degrees} height={30} />
+          </Panel>
 
-        <Panel style={{ gap: 14, borderRadius: 18 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <Txt f="bold" size={22} caps>Esta semana</Txt>
-            <Label>{new Date(ws).getDate()} a {new Date(ws + 6 * DAY).getDate()} {MONTHS[new Date(ws + 6 * DAY).getMonth()].slice(0, 3).toLowerCase()}</Label>
+          <Panel style={{ gap: 14, borderRadius: 18 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <Txt f="bold" size={22} caps>Esta semana</Txt>
+              <Label>{new Date(ws).getDate()} a {new Date(ws + 6 * DAY).getDate()} {MONTHS[new Date(ws + 6 * DAY).getMonth()].slice(0, 3).toLowerCase()}</Label>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
+              <Txt f="num" size={52} style={{ lineHeight: 58 }}>{String(week.count)}</Txt>
+              <Txt f="med" size={20} color={C.muted} caps>de {st.weeklyGoal} treinos da meta</Txt>
+            </View>
+            <View style={{ height: 10, borderRadius: 5, backgroundColor: C.line, overflow: 'hidden' }}>
+              <View style={{ width: `${goalPct * 100}%`, height: '100%', backgroundColor: b.accent }} />
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              {WD.map((w, i) => {
+                const done = week.days.has(i), isToday = i === today.getDay(), future = i > today.getDay();
+                return (
+                  <View key={w} style={{ alignItems: 'center', gap: 6 }}>
+                    <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: done ? b.accent : future ? 'transparent' : C.line,
+                      borderWidth: future && !done ? 1 : isToday ? 2 : 0, borderStyle: future && !done ? 'dashed' : 'solid', borderColor: isToday ? C.fg : C.line2 }} />
+                    <Txt f={isToday ? 'semi' : 'med'} size={13} color={isToday ? C.fg : C.muted} caps>{w}</Txt>
+                  </View>
+                );
+              })}
+            </View>
+            <View style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: C.line, paddingTop: 12 }}>
+              <View style={{ flex: 1 }}><Txt f="numMed" size={26}>{hm(week.work)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>No tatame</Txt></View>
+              <View style={{ flex: 1 }}><Txt f="numMed" size={26}>{String(week.rounds)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>Rondas</Txt></View>
+              <View style={{ flex: 1 }}><Txt f="numMed" size={26} color={diff > 0 ? C.work : diff < 0 ? C.rest : C.fg}>{diff > 0 ? `+${diff}` : String(diff)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>Vs. semana passada</Txt></View>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <View style={{ flex: 1 }}><PrimaryButton label="Ver relatório" height={50} onPress={soon} /></View>
+              <View style={{ flex: 1 }}><PrimaryButton label="+ Registrar" height={50} light={false} onPress={() => setDraft({ kind: 'Aula', daysAgo: 0, minutes: 60, rounds: 5 })} /></View>
+            </View>
+            {week.streak > 1 && <Txt f="med" size={16} color={C.soft} caps track={0.04}>{week.streak} semanas seguidas no tatame</Txt>}
+          </Panel>
+        </View>
+      } right={
+        <View style={{ paddingHorizontal: 20, paddingLeft: wide ? 0 : 20, paddingTop: wide ? 0 : 14, gap: 14 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: wide ? 0 : 4 }}>
+            <Pressable accessibilityLabel="Mês anterior" onPress={() => setView(v => v.m ? { y: v.y, m: v.m - 1 } : { y: v.y - 1, m: 11 })}
+              style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.panel, alignItems: 'center', justifyContent: 'center' }}><Txt size={22}>‹</Txt></Pressable>
+            <Txt f="bold" size={22} caps>{MONTHS[view.m]} {view.y}</Txt>
+            <Pressable accessibilityLabel="Próximo mês" disabled={isThisMonth} onPress={() => setView(v => v.m < 11 ? { y: v.y, m: v.m + 1 } : { y: v.y + 1, m: 0 })}
+              style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.panel, alignItems: 'center', justifyContent: 'center', opacity: isThisMonth ? 0.35 : 1 }}><Txt size={22}>›</Txt></Pressable>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
-            <Txt f="num" size={52} style={{ lineHeight: 58 }}>{String(week.count)}</Txt>
-            <Txt f="med" size={20} color={C.muted} caps>de {st.weeklyGoal} treinos da meta</Txt>
-          </View>
-          <View style={{ height: 10, borderRadius: 5, backgroundColor: C.line, overflow: 'hidden' }}>
-            <View style={{ width: `${goalPct * 100}%`, height: '100%', backgroundColor: b.accent }} />
-          </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            {WD.map((w, i) => {
-              const done = week.days.has(i), isToday = i === today.getDay(), future = i > today.getDay();
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+            {WD.map(w => <View key={w} style={{ width: `${100 / 7}%`, alignItems: 'center', paddingBottom: 4 }}><Txt f="numMed" size={13} color={C.muted}>{w[0]}</Txt></View>)}
+            {Array.from({ length: monthDays.first }, (_, i) => <View key={`e${i}`} style={{ width: `${100 / 7}%` }} />)}
+            {Array.from({ length: monthDays.total }, (_, i) => {
+              const d = i + 1, on = monthDays.set.has(d), isT = isThisMonth && d === today.getDate();
               return (
-                <View key={w} style={{ alignItems: 'center', gap: 6 }}>
-                  <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: done ? b.accent : future ? 'transparent' : C.line,
-                    borderWidth: future && !done ? 1 : isToday ? 2 : 0, borderStyle: future && !done ? 'dashed' : 'solid', borderColor: isToday ? C.fg : C.line2 }} />
-                  <Txt f={isToday ? 'semi' : 'med'} size={13} color={isToday ? C.fg : C.muted} caps>{w}</Txt>
+                <View key={d} style={{ width: `${100 / 7}%`, padding: 2.5 }}>
+                  <View style={{ paddingVertical: 8, borderRadius: 8, alignItems: 'center', backgroundColor: on ? b.accent : C.panel, borderWidth: isT ? 2 : 0, borderColor: C.fg }}>
+                    <Txt f="numMed" size={14} color={on ? b.ink : C.muted}>{String(d)}</Txt>
+                  </View>
                 </View>
               );
             })}
           </View>
-          <View style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: C.line, paddingTop: 12 }}>
-            <View style={{ flex: 1 }}><Txt f="numMed" size={26}>{hm(week.work)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>No tatame</Txt></View>
-            <View style={{ flex: 1 }}><Txt f="numMed" size={26}>{String(week.rounds)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>Rondas</Txt></View>
-            <View style={{ flex: 1 }}><Txt f="numMed" size={26} color={diff > 0 ? C.work : diff < 0 ? C.rest : C.fg}>{diff > 0 ? `+${diff}` : String(diff)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>Vs. semana passada</Txt></View>
+
+          <View>
+            <View style={{ paddingVertical: 6 }}><Label>Últimos treinos</Label></View>
+            {recent.length === 0 && <Txt f="reg" size={16} color={C.muted}>Os treinos aparecem aqui quando você termina ou para um treino com pelo menos 30 segundos de luta. Para anotar uma aula ou um rola feito sem o app, toque em “+ Registrar”.</Txt>}
+            {recent.map(h => {
+              const d = new Date(h.t);
+              const when = `${WD[d.getDay()]} ${d.getDate()}`;
+              return (
+                <Pressable key={h.t} onPress={() => setOpen({ s: h, confirm: false })} accessibilityRole="button" accessibilityHint="Ver detalhes ou excluir"
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.line }}>
+                  <View style={{ width: 6, height: 38, borderRadius: 3, backgroundColor: h.manual ? C.relax : h.mode === 'circuito' ? C.cycle : C.work }} />
+                  <View style={{ flex: 1 }}>
+                    <Txt f="semi" size={20} caps numberOfLines={1}>{title(h)}</Txt>
+                    <Txt f="med" size={14} color={C.muted} caps numberOfLines={1}>{when}{h.manual ? ' · registrado' : ''}{h.themes.length ? ` · ${h.themes.join(', ')}` : ''}</Txt>
+                  </View>
+                  <Txt f="numMed" size={20}>{hm(h.work)}</Txt>
+                  <Txt size={22} color={C.muted}>›</Txt>
+                </Pressable>
+              );
+            })}
           </View>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <View style={{ flex: 1 }}><PrimaryButton label="Ver relatório" height={50} onPress={soon} /></View>
-            <View style={{ flex: 1 }}><PrimaryButton label="+ Registrar" height={50} light={false} onPress={() => setDraft({ kind: 'Aula', daysAgo: 0, minutes: 60, rounds: 5 })} /></View>
-          </View>
-          {week.streak > 1 && <Txt f="med" size={16} color={C.soft} caps track={0.04}>{week.streak} semanas seguidas no tatame</Txt>}
-        </Panel>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4 }}>
-          <Pressable accessibilityLabel="Mês anterior" onPress={() => setView(v => v.m ? { y: v.y, m: v.m - 1 } : { y: v.y - 1, m: 11 })}
-            style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.panel, alignItems: 'center', justifyContent: 'center' }}><Txt size={22}>‹</Txt></Pressable>
-          <Txt f="bold" size={22} caps>{MONTHS[view.m]} {view.y}</Txt>
-          <Pressable accessibilityLabel="Próximo mês" disabled={isThisMonth} onPress={() => setView(v => v.m < 11 ? { y: v.y, m: v.m + 1 } : { y: v.y + 1, m: 0 })}
-            style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.panel, alignItems: 'center', justifyContent: 'center', opacity: isThisMonth ? 0.35 : 1 }}><Txt size={22}>›</Txt></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => setSettings(true)}
+            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 18, borderRadius: 16, backgroundColor: C.panel }}>
+            <View><Txt f="semi" size={20} caps>Ajustes</Txt><Txt f="med" size={14} color={C.muted} caps>Som, voz e meta semanal</Txt></View>
+            <Txt size={24} color={C.muted}>›</Txt>
+          </Pressable>
+          <Txt f="reg" size={13} color={C.muted} style={{ textAlign: 'center' }}>Temporizador BJJ · app em construção</Txt>
         </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-          {WD.map(w => <View key={w} style={{ width: `${100 / 7}%`, alignItems: 'center', paddingBottom: 4 }}><Txt f="numMed" size={13} color={C.muted}>{w[0]}</Txt></View>)}
-          {Array.from({ length: monthDays.first }, (_, i) => <View key={`e${i}`} style={{ width: `${100 / 7}%` }} />)}
-          {Array.from({ length: monthDays.total }, (_, i) => {
-            const d = i + 1, on = monthDays.set.has(d), isT = isThisMonth && d === today.getDate();
-            return (
-              <View key={d} style={{ width: `${100 / 7}%`, padding: 2.5 }}>
-                <View style={{ paddingVertical: 8, borderRadius: 8, alignItems: 'center', backgroundColor: on ? b.accent : C.panel, borderWidth: isT ? 2 : 0, borderColor: C.fg }}>
-                  <Txt f="numMed" size={14} color={on ? b.ink : C.muted}>{String(d)}</Txt>
-                </View>
-              </View>
-            );
-          })}
-        </View>
-
-        <View>
-          <View style={{ paddingVertical: 6 }}><Label>Últimos treinos</Label></View>
-          {recent.length === 0 && <Txt f="reg" size={16} color={C.muted}>Os treinos aparecem aqui quando você termina ou para um treino com pelo menos 30 segundos de luta. Para anotar uma aula ou um rola feito sem o app, toque em “+ Registrar”.</Txt>}
-          {recent.map(h => {
-            const d = new Date(h.t);
-            const when = `${WD[d.getDay()]} ${d.getDate()}`;
-            return (
-              <Pressable key={h.t} onPress={() => setOpen({ s: h, confirm: false })} accessibilityRole="button" accessibilityHint="Ver detalhes ou excluir"
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.line }}>
-                <View style={{ width: 6, height: 38, borderRadius: 3, backgroundColor: h.manual ? C.relax : h.mode === 'circuito' ? C.cycle : C.work }} />
-                <View style={{ flex: 1 }}>
-                  <Txt f="semi" size={20} caps numberOfLines={1}>{title(h)}</Txt>
-                  <Txt f="med" size={14} color={C.muted} caps numberOfLines={1}>{when}{h.manual ? ' · registrado' : ''}{h.themes.length ? ` · ${h.themes.join(', ')}` : ''}</Txt>
-                </View>
-                <Txt f="numMed" size={20}>{hm(h.work)}</Txt>
-                <Txt size={22} color={C.muted}>›</Txt>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <Pressable accessibilityRole="button" onPress={() => setSettings(true)}
-          style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 18, borderRadius: 16, backgroundColor: C.panel }}>
-          <View><Txt f="semi" size={20} caps>Ajustes</Txt><Txt f="med" size={14} color={C.muted} caps>Som, voz e meta semanal</Txt></View>
-          <Txt size={24} color={C.muted}>›</Txt>
-        </Pressable>
-        <Txt f="reg" size={13} color={C.muted} style={{ textAlign: 'center' }}>Temporizador BJJ · app em construção</Txt>
-      </ScrollView>
+      } />
 
       <Sheet open={!!profile} title="Seu perfil" onClose={() => setProfile(null)}
         actions={<SheetActions onCancel={() => setProfile(null)} onOk={() => {

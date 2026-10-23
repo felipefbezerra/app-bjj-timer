@@ -1,10 +1,10 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 
 import { IconHandle, IconPlay } from '@/components/icons';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
-import { Label, Panel, PrimaryButton, Screen, Stat, Txt } from '@/components/ui';
+import { Label, Panel, PrimaryButton, Screen, Split, Stat, Txt, useWide } from '@/components/ui';
 import { newRun, setPendingRun } from '@/lib/runner';
 import { Sound } from '@/lib/sound';
 import { buildSequence, fmtClock, totalSeconds, type CircuitoConfig, type Station } from '@/lib/sequence';
@@ -20,6 +20,7 @@ export default function Circuito() {
   const b = beltLook(store.profile.belt, C);
   const [times, setTimes] = useState<CircuitoConfig | null>(null);
   const [station, setStation] = useState<StationEdit | null>(null);
+  const wide = useWide();
 
   const start = () => {
     const seq = buildSequence('circuito', c);
@@ -54,10 +55,16 @@ export default function Circuito() {
   };
 
   const work = c.stations[0]?.dur ?? 40;
+  // Com a tela larga, o botão fica embaixo dos tempos, sem precisar rolar a lista de estações.
+  const startButton = (
+    <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
+      <PrimaryButton label="Começar circuito" icon={<IconPlay color={C.ink} />} onPress={start} />
+    </View>
+  );
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+      <Split left={<>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10 }}>
           <View style={{ gap: 2 }}>
             <Label size={15}>Condicionamento</Label>
@@ -75,11 +82,13 @@ export default function Circuito() {
           </Panel>
         </Pressable>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 6 }}>
+        {wide && startButton}
+      </>} right={<>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, paddingLeft: wide ? 0 : 20, paddingTop: 18, paddingBottom: 6 }}>
           <Label>Estações</Label><Label>{String(c.stations.length)}</Label>
         </View>
 
-        <View style={{ paddingHorizontal: 20, gap: 8 }}>
+        <View style={{ paddingHorizontal: 20, paddingLeft: wide ? 0 : 20, gap: 8 }}>
           {c.stations.map((x, i) => (
             <Pressable key={i} accessibilityRole="button" onPress={() => setStation({ index: i, st: { ...x } })}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 14, backgroundColor: C.panel }}>
@@ -99,10 +108,8 @@ export default function Circuito() {
           )}
         </View>
 
-        <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
-          <PrimaryButton label="Começar circuito" icon={<IconPlay color={C.ink} />} onPress={start} />
-        </View>
-      </ScrollView>
+        {!wide && startButton}
+      </>} />
 
       <Sheet open={!!times} title="Tempos do circuito" onClose={() => setTimes(null)}
         actions={<SheetActions onCancel={() => setTimes(null)} onOk={() => { if (times) store.set({ circuito: times }); setTimes(null); }} okLabel="Guardar" />}>
