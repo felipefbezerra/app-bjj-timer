@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Temporizador de combate, circuito e cronômetro para treinos e lutas de jiu-jitsu." />
+    <meta name="theme-color" content="#111315" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BJJ Timer" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <title>BJJ Timer</title>
+    <script>
+      // Fundo na cor do tema antes do app carregar, para não piscar branco.
+      (function () {
+        var m = 'auto';
+        try { m = (JSON.parse(localStorage.getItem('bjj.data.v1')) || {}).theme || 'auto'; } catch (e) {}
+        var light = m === 'light' || (m === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches);
+        document.documentElement.style.background = light ? '#eeebe3' : '#111315';
+      })();
+    </script>
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        overflow: hidden;
+        margin: 0;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>Ative o JavaScript para usar o BJJ Timer.</noscript>
+    <div id="root"></div>
+    <script>
+      // Versão instalável (PWA): guarda o app para abrir sem internet e se atualiza sozinho.
+      if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(function (r) { r.update(); }).catch(function () {});
+        });
+        // Quando uma versão nova assume, recarrega uma vez, mas nunca no meio de um treino.
+        var hadController = !!navigator.serviceWorker.controller, reloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (!hadController || reloaded || location.pathname.indexOf('/treino') === 0) return;
+          reloaded = true;
+          location.reload();
+        });
+      }
+    </script>
+  </body>
+</html>

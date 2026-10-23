@@ -4,14 +4,22 @@ import android.app.PictureInPictureParams
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Rational
+import androidx.activity.ComponentActivity
+import androidx.core.app.PictureInPictureModeChangedInfo
+import androidx.core.util.Consumer
 import expo.modules.kotlin.functions.Queues
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
 // Janelinha flutuante (picture-in-picture) do treino no Android.
 // Com ela ligada, o app vira uma janela pequena por cima dos outros apps quando você sai dele.
+// O evento onPipChange avisa a tela quando entra e sai da janelinha, para ela trocar de layout.
 class TimerPipModule : Module() {
   private var enabled = false
+  private var watched: ComponentActivity? = null
+  private val listener = Consumer<PictureInPictureModeChangedInfo> { info ->
+    sendEvent("onPipChange", mapOf("active" to info.isInPictureInPictureMode))
+  }
 
   private fun supported(): Boolean {
     val activity = appContext.currentActivity ?: return false
@@ -28,22 +36,38 @@ class TimerPipModule : Module() {
     return builder.build()
   }
 
+  private fun watch() {
+    val activity = appContext.currentActivity as? ComponentActivity ?: return
+    if (watched === activity) return
+    watched?.removeOnPictureInPictureModeChangedListener(listener)
+    activity.addOnPictureInPictureModeChangedListener(listener)
+    watched = activity
+  }
+
   private fun enter(): Boolean {
     val activity = appContext.currentActivity ?: return false
     if (!supported()) return false
     val p = params() ?: return false
+    watch()
     return try { activity.enterPictureInPictureMode(p) } catch (e: Exception) { false }
   }
 
   override fun definition() = ModuleDefinition {
     Name("TimerPip")
 
+    Events("onPipChange")
+
     Function<Boolean>("isSupported") { supported() }
+
+    Function<Boolean>("isActive") {
+      Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && appContext.currentActivity?.isInPictureInPictureMode == true
+    }
 
     AsyncFunction("setEnabled") { on: Boolean ->
       enabled = on
       val activity = appContext.currentActivity
       if (activity != null && supported()) {
+        watch()
         params()?.let { try { activity.setPictureInPictureParams(it) } catch (e: Exception) {} }
       }
     }.runOnQueue(Queues.MAIN)
@@ -55,6 +79,11 @@ class TimerPipModule : Module() {
       if (enabled && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
         appContext.currentActivity?.runOnUiThread { enter() }
       }
+    }
+
+    OnDestroy {
+      watched?.removeOnPictureInPictureModeChangedListener(listener)
+      watched = null
     }
   }
 }

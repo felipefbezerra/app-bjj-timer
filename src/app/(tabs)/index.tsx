@@ -7,6 +7,7 @@ import { IconPlay } from '@/components/icons';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
 import { Label, Panel, PrimaryButton, Screen, Stat, Txt } from '@/components/ui';
 import { newRun, setPendingRun } from '@/lib/runner';
+import { Sound } from '@/lib/sound';
 import { buildSequence, fmtClock, totalSeconds, type CombateConfig } from '@/lib/sequence';
 import { presetsFor, useStore } from '@/lib/store';
 import { beltLook, useC } from '@/lib/theme';
@@ -23,6 +24,7 @@ export default function Combate() {
   const start = () => {
     const seq = buildSequence('combate', c);
     if (!seq.length) return;
+    Sound.prime();
     setPendingRun(newRun('combate', `${sel.kicker} ${sel.big}`, seq));
     router.push('/treino');
   };

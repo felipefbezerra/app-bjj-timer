@@ -6,6 +6,7 @@ import { IconHandle, IconPlay } from '@/components/icons';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
 import { Label, Panel, PrimaryButton, Screen, Stat, Txt } from '@/components/ui';
 import { newRun, setPendingRun } from '@/lib/runner';
+import { Sound } from '@/lib/sound';
 import { buildSequence, fmtClock, totalSeconds, type CircuitoConfig, type Station } from '@/lib/sequence';
 import { useStore } from '@/lib/store';
 import { beltLook, F, useC } from '@/lib/theme';
@@ -23,6 +24,7 @@ export default function Circuito() {
   const start = () => {
     const seq = buildSequence('circuito', c);
     if (!seq.length) return;
+    Sound.prime();
     setPendingRun(newRun('circuito', 'Circuito', seq));
     router.push('/treino');
   };

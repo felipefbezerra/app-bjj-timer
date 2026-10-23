@@ -33,6 +33,20 @@ npx expo start
 > No Expo Go ele pode se comportar diferente. Para testar isso, gere um build de desenvolvimento com
 > `npx expo run:android` / `npx expo run:ios` ou com o EAS Build.
 
+## Versão web (PWA)
+
+O mesmo código vira o site instalável, com o mesmo design e as mesmas funções do app.
+
+```bash
+npm run build:web   # gera a pasta dist (expo export + service worker para abrir sem internet)
+```
+
+- Na Vercel, importe este repositório: o `vercel.json` já diz como montar e publicar.
+- No navegador, o segundo plano usa um tom inaudível pelo Web Audio (a música de outros apps continua tocando),
+  e a janelinha usa o picture-in-picture do navegador. Os bipes saem pelo Web Audio e a voz pelo leitor do aparelho.
+- Na primeira abertura no mesmo endereço do site antigo, o histórico, a faixa, o som e o tema salvos nele são trazidos.
+- Arquivos só da web terminam em `.web.ts` (em `src/lib`); o app no celular não usa esses arquivos.
+
 ## APK para Android
 
 A cada mudança no `main`, o GitHub Actions gera um APK de teste e publica em
@@ -53,6 +67,8 @@ modules/timer-pip/  módulo nativo (Android) da janelinha flutuante
 plugins/            ajustes nativos do Android (serviço, janelinha, ícone da notificação)
 assets/textures/    tecido do tatame em cada cor
 assets/sounds/      bipes e o áudio silencioso que mantém o app vivo em segundo plano
+public/             página, manifesto e ícones da versão web (PWA)
+scripts/            gera o service worker da versão web depois do build
 ```
 
 ## Verificações
@@ -65,5 +81,5 @@ npx eslint .
 ## Próximos passos
 
 - Ícone e tela de abertura próprios (hoje são os do modelo do Expo).
-- Relatório semanal e registro manual de treinos.
+- Relatório semanal.
 - No iPhone, a janelinha equivalente seria uma Live Activity (tela de bloqueio e Dynamic Island).

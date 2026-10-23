@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
+import { readLegacy } from './legacy';
 import { BELTS, type BeltKey } from './theme';
 import { DEFAULT_CIRCUITO, type CircuitoConfig, type CombateConfig, type Mode } from './sequence';
 
@@ -68,6 +69,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     AsyncStorage.getItem(KEY).then(raw => {
       if (raw) { try { setData(d => ({ ...d, ...JSON.parse(raw) })); } catch {} }
+      else { const old = readLegacy(); if (old) setData(d => ({ ...d, ...old })); }
       loaded.current = true; setReady(true);
     });
   }, []);
