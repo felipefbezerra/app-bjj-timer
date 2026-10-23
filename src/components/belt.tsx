@@ -6,7 +6,7 @@ const STRIPE = '#f3f1ea';
 
 // A faixa do app. Sem "fill" é a faixa cheia com os graus na ponteira.
 // Com "fill" (0 a 1) ela vira barra de progresso: a cor vai preenchendo e a ponteira mostra
-// uma listra por ronda (feitas em branco, a atual na cor da fase, as próximas apagadas).
+// uma listra por volta (feitas em branco, a atual na cor da fase, as próximas apagadas).
 export function Belt({ belt, degrees = 0, height = 30, width, fill, rounds, roundsDone = 0, current, small }: {
   belt: BeltKey; degrees?: number; height?: number; width?: number | `${number}%`;
   fill?: number; rounds?: number; roundsDone?: number; current?: string; small?: boolean;

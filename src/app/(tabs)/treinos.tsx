@@ -74,7 +74,7 @@ export default function Treinos() {
     setDraft(null);
   };
   const title = (h: Session) => {
-    const unit = h.mode === 'circuito' ? (h.rounds === 1 ? 'estação' : 'estações') : (h.rounds === 1 ? 'ronda' : 'rondas');
+    const unit = h.mode === 'circuito' ? (h.rounds === 1 ? 'estação' : 'estações') : (h.rounds === 1 ? 'volta' : 'voltas');
     const kind = h.manual ? h.label : h.mode === 'circuito' ? 'Circuito' : 'Combate';
     return `${kind}${h.rounds ? ` · ${h.rounds} ${unit}` : ''}${h.done ? '' : ' · parcial'}`;
   };
@@ -123,7 +123,7 @@ export default function Treinos() {
             </View>
             <View style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: C.line, paddingTop: 12 }}>
               <View style={{ flex: 1 }}><Txt f="numMed" size={26}>{hm(week.work)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>No tatame</Txt></View>
-              <View style={{ flex: 1 }}><Txt f="numMed" size={26}>{String(week.rounds)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>Rondas</Txt></View>
+              <View style={{ flex: 1 }}><Txt f="numMed" size={26}>{String(week.rounds)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>Voltas</Txt></View>
               <View style={{ flex: 1 }}><Txt f="numMed" size={26} color={diff > 0 ? C.work : diff < 0 ? C.rest : C.fg}>{diff > 0 ? `+${diff}` : String(diff)}</Txt><Txt f="med" size={12} color={C.muted} caps track={0.1}>Vs. semana passada</Txt></View>
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -259,7 +259,7 @@ export default function Treinos() {
           </View>
           <Stepper label="Dia" value={dayLabel(draft.daysAgo, now)} onMinus={() => setDraft({ ...draft, daysAgo: Math.min(60, draft.daysAgo + 1) })} onPlus={() => setDraft({ ...draft, daysAgo: Math.max(0, draft.daysAgo - 1) })} />
           <Stepper label="Duração" value={hm(draft.minutes * 60)} onMinus={() => setDraft({ ...draft, minutes: Math.max(5, draft.minutes - 5) })} onPlus={() => setDraft({ ...draft, minutes: Math.min(300, draft.minutes + 5) })} />
-          <Stepper label={draft.kind === 'Circuito' ? 'Estações feitas' : 'Rondas (0 se não contou)'} value={String(draft.rounds)} onMinus={() => setDraft({ ...draft, rounds: Math.max(0, draft.rounds - 1) })} onPlus={() => setDraft({ ...draft, rounds: Math.min(60, draft.rounds + 1) })} />
+          <Stepper label={draft.kind === 'Circuito' ? 'Estações feitas' : 'Voltas (0 se não contou)'} value={String(draft.rounds)} onMinus={() => setDraft({ ...draft, rounds: Math.max(0, draft.rounds - 1) })} onPlus={() => setDraft({ ...draft, rounds: Math.min(60, draft.rounds + 1) })} />
           <Txt f="reg" size={14} color={C.muted}>O treino entra na meta da semana, no calendário e na sequência de semanas.</Txt>
         </>}
       </Sheet>
@@ -282,7 +282,7 @@ export default function Treinos() {
             <Label size={15}>{`${WD[d.getDay()]}, ${d.getDate()} de ${MONTHS[d.getMonth()].toLowerCase()} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`}</Label>
             <View style={{ flexDirection: 'row' }}>
               <View style={{ flex: 1 }}><Txt f="num" size={34}>{hm(h.work)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.1}>{h.manual ? 'Duração' : h.mode === 'circuito' ? 'De exercício' : 'De luta'}</Txt></View>
-              <View style={{ flex: 1 }}><Txt f="num" size={34}>{String(h.rounds)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.1}>{h.mode === 'circuito' ? 'Estações' : 'Rondas'}</Txt></View>
+              <View style={{ flex: 1 }}><Txt f="num" size={34}>{String(h.rounds)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.1}>{h.mode === 'circuito' ? 'Estações' : 'Voltas'}</Txt></View>
             </View>
             {h.themes.length > 0 && <Txt f="med" size={16} color={C.soft}>{h.themes.join(', ')}</Txt>}
             <Txt f="reg" size={14} color={C.muted}>{h.manual ? 'Registrado à mão.' : `Feito com o temporizador (${h.label}).`}{open.confirm ? ' Toque em “Confirmar” para excluir de vez.' : ''}</Txt>

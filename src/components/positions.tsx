@@ -18,7 +18,7 @@ type Props = {
   onCustom: (custom: string[]) => void;
 };
 
-// Escolha das posições que aparecem grandes na tela, uma por ronda, em ordem ou sorteadas.
+// Escolha das posições que aparecem grandes na tela, uma por volta, em ordem ou sorteadas.
 // Fica montada só enquanto aberta, para começar sempre com a escolha atual.
 export function PositionsSheet({ themes, order, custom, accent, ink, onClose, onSave, onCustom }: Props) {
   const C = useC();
@@ -54,7 +54,7 @@ export function PositionsSheet({ themes, order, custom, accent, ink, onClose, on
 
   return (
     <Sheet open title="Posições" onClose={onClose} actions={actions}>
-      <Txt f="reg" size={15} color={C.muted}>Toque para escolher. A posição aparece grande na tela e é falada no começo de cada ronda.</Txt>
+      <Txt f="reg" size={15} color={C.muted}>Toque para escolher. A posição aparece grande na tela e é falada no começo de cada volta.</Txt>
 
       <View style={{ flexDirection: 'row', gap: 6, backgroundColor: C.ground, borderRadius: 12, padding: 4 }}>
         {([['seq', 'Em ordem'], ['rand', 'Sortear']] as [Order, string][]).map(([k, t]) => (
