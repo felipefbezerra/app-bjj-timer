@@ -29,7 +29,7 @@ const LOOK: Record<PhaseType, { color: string; tone: TextureKey; soft: string }>
 function bgInfo(r: Run): BgInfo {
   const s = r.seq[r.i], nx = r.seq[r.i + 1];
   const works = r.seq.filter(x => x.type === 'work').length;
-  const counter = s.round ? (r.mode === 'circuito' ? `Estação ${s.round} · Volta ${s.cycle}` : `Ronda ${s.round} de ${works}`) : r.label;
+  const counter = s.round ? (r.mode === 'circuito' ? `Estação ${s.round} · Volta ${s.cycle}` : `Volta ${s.round} de ${works}`) : r.label;
   const theme = s.type === 'work' ? s.theme : nx?.theme ? `Próxima: ${nx.theme}` : undefined;
   const total = r.seq.reduce((a, x) => a + x.dur, 0);
   const left = Math.max(0, r.remaining) + r.seq.slice(r.i + 1).reduce((a, x) => a + x.dur, 0);
@@ -171,7 +171,7 @@ function Treino() {
   const left = Math.max(0, r.remaining) + r.seq.slice(r.i + 1).reduce((a, x) => a + x.dur, 0);
   const doneRounds = r.seq.slice(0, r.i).filter(x => x.type === 'work').length;
   const fill = s.type === 'work' ? (doneRounds + (1 - Math.max(0, r.remaining) / s.dur)) / Math.max(1, workPhases.length) : doneRounds / Math.max(1, workPhases.length);
-  const counter = s.round ? (r.mode === 'circuito' ? `Estação ${s.round} · Volta ${s.cycle}` : `Ronda ${s.round} de ${workPhases.length}`) : r.label;
+  const counter = s.round ? (r.mode === 'circuito' ? `Estação ${s.round} · Volta ${s.cycle}` : `Volta ${s.round} de ${workPhases.length}`) : r.label;
 
   if (compact) return <Mini color={look.color} time={fmtClock(r.remaining)} label={theme ?? name} />;
 
@@ -276,7 +276,7 @@ function Done({ run, onClose, landscape }: { run: Run; onClose: () => void; land
   const who = st.profile.name ? `Oss, ${st.profile.name}!` : 'Oss!';
 
   const share = () => Share.share({
-    message: `Treino concluído no Temporizador BJJ: ${run.rounds} ${run.mode === 'circuito' ? 'estações' : 'rondas'}, ${minutes} min de ${run.mode === 'circuito' ? 'exercício' : 'luta'}${run.done.length ? ` (${run.done.join(', ')})` : ''}. ${who}`,
+    message: `Treino concluído no Temporizador BJJ: ${run.rounds} ${run.mode === 'circuito' ? 'estações' : 'voltas'}, ${minutes} min de ${run.mode === 'circuito' ? 'exercício' : 'luta'}${run.done.length ? ` (${run.done.join(', ')})` : ''}. ${who}`,
   }).catch(() => {});
 
   const body = (
@@ -289,7 +289,7 @@ function Done({ run, onClose, landscape }: { run: Run; onClose: () => void; land
         <Panel stitch style={{ gap: 18, borderRadius: 18, padding: 20 }}>
           <Belt belt={st.profile.belt} height={34} fill={1} rounds={rounds} roundsDone={rounds} />
           <View style={{ flexDirection: 'row' }}>
-            <View style={{ flex: 1 }}><Txt f="num" size={40}>{String(run.rounds)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.12}>{run.mode === 'circuito' ? 'Estações' : 'Rondas'}</Txt></View>
+            <View style={{ flex: 1 }}><Txt f="num" size={40}>{String(run.rounds)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.12}>{run.mode === 'circuito' ? 'Estações' : 'Voltas'}</Txt></View>
             <View style={{ flex: 1 }}><Txt f="num" size={40}>{String(minutes)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.12}>{run.mode === 'circuito' ? 'Min de treino' : 'Min de luta'}</Txt></View>
             <View style={{ flex: 1 }}><Txt f="num" size={40}>{String(inWeek)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.12}>Na semana</Txt></View>
           </View>

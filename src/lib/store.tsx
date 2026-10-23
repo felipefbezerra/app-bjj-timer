@@ -52,11 +52,11 @@ export function presetsFor(belt: BeltKey, custom: CombateConfig): Preset[] {
   const fightMin = b.fight / 60;
   const base = { prep: 10, relax: 0, themes: [] as string[], themeOrder: 'seq' as const };
   return [
-    { id: 'aula', kicker: 'Aula', big: '5×5', lines: ['5 rondas · 5 min', '1 min de descanso'], config: { ...base, work: 300, rest: 60, rounds: 5 } },
+    { id: 'aula', kicker: 'Aula', big: '5×5', lines: ['5 voltas · 5 min', '1 min de descanso'], config: { ...base, work: 300, rest: 60, rounds: 5 } },
     { id: 'competicao', kicker: 'Competição', big: `${fightMin}:00`, lines: ['Tempo de luta', `da faixa ${b.name.toLowerCase()}`], config: { ...base, work: b.fight, rest: 0, rounds: 1 } },
     { id: 'rola', kicker: 'Rola livre', big: '8×6', lines: ['8 rolas · 6 min', 'sem tema'], config: { ...base, work: 360, rest: 60, rounds: 8 } },
     { id: 'posicao', kicker: 'Posição', big: '6×3', lines: ['Costas, montada,', 'guarda e mais'], config: { ...base, work: 180, rest: 30, rounds: 6, themes: ['Costas', 'Montada', 'Guarda fechada', 'Meia-guarda', 'Passagem de guarda', 'Raspagem'] } },
-    { id: 'custom', kicker: 'Meu treino', big: `${custom.rounds}×${Math.round(custom.work / 60)}`, lines: [`${custom.rounds} rondas`, 'do seu jeito'], config: custom },
+    { id: 'custom', kicker: 'Meu treino', big: `${custom.rounds}×${Math.round(custom.work / 60)}`, lines: [`${custom.rounds} voltas`, 'do seu jeito'], config: custom },
   ];
 }
 

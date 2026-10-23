@@ -83,7 +83,7 @@ export default function Combate() {
             <Stat value={fmtClock(c.prep)} label="Preparar" color={C.prep} />
             <Stat value={fmtClock(c.work)} label="Luta" color={C.work} />
             <Stat value={c.rest ? fmtClock(c.rest) : '—'} label="Descanso" color={C.rest} />
-            <Stat value={String(c.rounds)} label="Rondas" />
+            <Stat value={String(c.rounds)} label="Voltas" />
           </View>
           <Pressable accessibilityRole="button" accessibilityLabel="Escolher posições" onPress={() => setPicking(true)}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderTopWidth: 1, borderTopColor: C.line, paddingTop: 10 }}>
@@ -116,7 +116,7 @@ export default function Combate() {
           <Stepper label="Preparar" color={C.prep} value={fmtClock(edit.prep)} onMinus={() => setEdit({ ...edit, prep: Math.max(0, edit.prep - 5) })} onPlus={() => setEdit({ ...edit, prep: edit.prep + 5 })} />
           <Stepper label="Luta" color={C.work} value={fmtClock(edit.work)} onMinus={() => setEdit({ ...edit, work: Math.max(30, edit.work - 30) })} onPlus={() => setEdit({ ...edit, work: edit.work + 30 })} />
           <Stepper label="Descanso" color={C.rest} value={fmtClock(edit.rest)} onMinus={() => setEdit({ ...edit, rest: Math.max(0, edit.rest - 15) })} onPlus={() => setEdit({ ...edit, rest: edit.rest + 15 })} />
-          <Stepper label="Rondas" value={String(edit.rounds)} onMinus={() => setEdit({ ...edit, rounds: Math.max(1, edit.rounds - 1) })} onPlus={() => setEdit({ ...edit, rounds: Math.min(99, edit.rounds + 1) })} />
+          <Stepper label="Voltas" value={String(edit.rounds)} onMinus={() => setEdit({ ...edit, rounds: Math.max(1, edit.rounds - 1) })} onPlus={() => setEdit({ ...edit, rounds: Math.min(99, edit.rounds + 1) })} />
           <Stepper label="Relaxe no fim" color={C.relax} value={fmtClock(edit.relax)} onMinus={() => setEdit({ ...edit, relax: Math.max(0, edit.relax - 30) })} onPlus={() => setEdit({ ...edit, relax: edit.relax + 30 })} />
           <Txt f="reg" size={14} color={C.muted}>Os ajustes ficam salvos no card “Meu treino”.</Txt>
         </>}

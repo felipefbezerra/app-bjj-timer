@@ -112,7 +112,7 @@ export function phaseSpeech(r: Run) {
   if (s.type === 'work') {
     const rounds = r.seq.filter(x => x.type === 'work').length;
     const last = r.mode === 'combate' && rounds > 1 && s.round === rounds;
-    return [last ? 'Última ronda' : '', s.theme ?? '', r.mode === 'combate' ? 'Combate!' : 'Valendo!'].filter(Boolean).join('. ');
+    return [last ? 'Última volta' : '', s.theme ?? '', r.mode === 'combate' ? 'Combate!' : 'Valendo!'].filter(Boolean).join('. ');
   }
   if (s.type === 'rest' || s.type === 'cycle') {
     const base = s.type === 'cycle' ? 'Tempo! Descanso entre voltas' : 'Tempo! Descanso';

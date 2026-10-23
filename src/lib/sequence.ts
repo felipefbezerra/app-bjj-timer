@@ -67,7 +67,7 @@ export function buildSequence(mode: Mode, c: CombateConfig | CircuitoConfig): Ph
   return seq;
 }
 
-// Uma posição por ronda. Sorteando, todas saem antes de alguma repetir, e a mesma nunca vem duas vezes seguidas.
+// Uma posição por volta. Sorteando, todas saem antes de alguma repetir, e a mesma nunca vem duas vezes seguidas.
 export function pickThemes(list: string[], order: 'seq' | 'rand', rounds: number): (string | undefined)[] {
   if (!list.length) return [];
   if (order !== 'rand') return Array.from({ length: rounds }, (_, i) => list[i % list.length]);
