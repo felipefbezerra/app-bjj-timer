@@ -8,7 +8,7 @@ Roda em Android e iPhone com o mesmo código. **App em construção**, ainda nã
 - **Combate**: treinos prontos (Aula, Competição com o tempo da sua faixa, Rola longo, Posição) e "Meu treino" ajustável.
   Em **Posições** você escolhe da lista ou cria as suas, em ordem ou sorteadas (todas saem antes de repetir).
   A posição da ronda aparece grande na tela e é falada no começo.
-- **Circuito**: estações com nome e tempo, troca, voltas e descanso entre voltas.
+- **Circuito**: prontos (Condicionamento, Drills de técnica e Circuito curto 30/10) e "Meu circuito", com estações de nome e tempo, troca, voltas e descanso entre voltas.
 - **Cronômetro**: com voltas.
 - **Treinos**: perfil (nome, faixa, graus), meta da semana, sequência, calendário do mês e últimos treinos.
   Dá para registrar à mão um treino feito sem o app (aula, rola, drill, circuito, competição) e excluir qualquer treino tocando nele.

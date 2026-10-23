@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState, type R
 
 import { readLegacy } from './legacy';
 import { BELTS, type BeltKey } from './theme';
-import { DEFAULT_CIRCUITO, type CircuitoConfig, type CombateConfig, type Mode } from './sequence';
+import { DEFAULT_CIRCUITO, type CircuitoConfig, type CircuitoPresetId, type CombateConfig, type Mode } from './sequence';
 
 export type Profile = { name: string; belt: BeltKey; degrees: number };
 export type SoundMode = 'voice' | 'beep' | 'mute';
@@ -20,6 +20,8 @@ type Data = {
   preset: PresetId;
   custom: CombateConfig;
   circuito: CircuitoConfig;
+  // Circuito escolhido: um dos prontos ou o "Meu circuito" (circuito).
+  circuitoPreset: CircuitoPresetId;
   history: Session[];
   // Posições criadas pela pessoa, além da lista padrão.
   positions: string[];
@@ -35,6 +37,7 @@ const DEFAULTS: Data = {
   preset: 'aula',
   custom: DEFAULT_CUSTOM,
   circuito: DEFAULT_CIRCUITO,
+  circuitoPreset: 'custom',
   history: [],
   positions: [],
 };

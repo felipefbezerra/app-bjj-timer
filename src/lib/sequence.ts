@@ -11,7 +11,8 @@ export type Phase = {
 
 export type CombateConfig = { prep: number; work: number; rest: number; rounds: number; relax: number; themes: string[]; themeOrder: 'seq' | 'rand' };
 export type Station = { name: string; dur: number };
-export type CircuitoConfig = { prep: number; stations: Station[]; rest: number; rounds: number; cycleRest: number; relax: number };
+// drill: as estações são técnicas (drill de técnica), e a tela chama assim.
+export type CircuitoConfig = { prep: number; stations: Station[]; rest: number; rounds: number; cycleRest: number; relax: number; drill?: boolean };
 
 export const POSITIONS = ['Passagem de guarda', 'Guarda fechada', 'Meia-guarda', 'Guarda aberta', 'Raspagem', 'Montada',
   'Costas', 'Cem quilos', 'Joelho na barriga', 'Queda', 'Saída de montada', 'Saída de cem quilos', 'Finalização'];
@@ -21,6 +22,25 @@ export const DEFAULT_CIRCUITO: CircuitoConfig = {
   stations: [{ name: 'Sprawl', dur: 40 }, { name: 'Fuga de quadril', dur: 40 }, { name: 'Ponte', dur: 40 }, { name: 'Pegada no kimono', dur: 40 }, { name: 'Burpee', dur: 40 }],
   rest: 20, rounds: 3, cycleRest: 60, relax: 0,
 };
+
+export type CircuitoPresetId = 'condicionamento' | 'drills' | 'curto' | 'custom';
+export type CircuitoPreset = { id: Exclude<CircuitoPresetId, 'custom'>; kicker: string; big: string; line: string; config: CircuitoConfig };
+
+// Circuitos prontos, os mesmos do site antigo.
+export const CIRCUITO_PRESETS: CircuitoPreset[] = [
+  { id: 'condicionamento', kicker: 'Condicionamento', big: '6×45s', line: '3 voltas · troca 15s', config: {
+    prep: 30, rest: 15, rounds: 3, cycleRest: 90, relax: 120,
+    stations: [{ name: 'Sprawl', dur: 45 }, { name: 'Fuga de quadril', dur: 45 }, { name: 'Ponte', dur: 45 }, { name: 'Burpee', dur: 45 }, { name: 'Sit-out', dur: 45 }, { name: 'Entrada de queda', dur: 45 }],
+  } },
+  { id: 'drills', kicker: 'Drills de técnica', big: '4×2:00', line: '2 voltas · troca 20s', config: {
+    prep: 15, rest: 20, rounds: 2, cycleRest: 120, relax: 60, drill: true,
+    stations: [{ name: 'Armlock da guarda', dur: 120 }, { name: 'Raspagem de tesoura', dur: 120 }, { name: 'Passagem toreando', dur: 120 }, { name: 'Pegada das costas', dur: 120 }],
+  } },
+  { id: 'curto', kicker: 'Circuito curto', big: '30/10', line: '4 voltas · 4 exercícios', config: {
+    prep: 10, rest: 10, rounds: 4, cycleRest: 60, relax: 60,
+    stations: [{ name: 'Sprawl', dur: 30 }, { name: 'Fuga de quadril', dur: 30 }, { name: 'Burpee', dur: 30 }, { name: 'Ponte', dur: 30 }],
+  } },
+];
 
 export function buildSequence(mode: Mode, c: CombateConfig | CircuitoConfig): Phase[] {
   const seq: Phase[] = [];
