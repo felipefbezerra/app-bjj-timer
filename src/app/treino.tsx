@@ -8,11 +8,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Belt } from '@/components/belt';
 import { IconClose, IconNext, IconPip, IconPrev, IconShare } from '@/components/icons';
+import { Resumo } from '@/components/resumo';
 import { Fabric, IconButton, Label, Panel, PrimaryButton, Txt } from '@/components/ui';
 import { Background, type BgInfo } from '@/lib/background';
 import { Janela, type JanelaInfo } from '@/lib/janela';
-import { jump, phaseSpeech, RunStore, step, clearPendingRun, peekPendingRun, togglePause, type Run, type RunEvent } from '@/lib/runner';
-import { fmtClock, phaseName, type PhaseType } from '@/lib/sequence';
+import { jump, phaseSpeech, RunStore, step, stopRun, clearPendingRun, peekPendingRun, togglePause, type Run, type RunEvent } from '@/lib/runner';
+import { fmtClock, phaseName, type Phase, type PhaseType } from '@/lib/sequence';
 import { Sound } from '@/lib/sound';
 import { useStore } from '@/lib/store';
 import { DARK as C, ThemeCtx, type TextureKey } from '@/lib/theme';
@@ -25,11 +26,20 @@ const LOOK: Record<PhaseType, { color: string; tone: TextureKey; soft: string }>
   relax: { color: C.relax, tone: 'azul', soft: '#aebdcc' },
 };
 
+const lookOf = (s: Phase) => LOOK[s.look ?? s.type];
+
+// Contador embaixo do tempo: volta, estação ou, nos planos, o bloco e o item.
+function counterOf(r: Run, s: Phase, works: number) {
+  if (r.mode === 'plano') return s.tag ?? r.label;
+  if (!s.round) return r.label;
+  return r.mode === 'circuito' ? `Estação ${s.round} · Volta ${s.cycle}` : `Volta ${s.round} de ${works}`;
+}
+
 // O que aparece na notificação do Android enquanto o treino roda fora da tela.
 function bgInfo(r: Run): BgInfo {
   const s = r.seq[r.i], nx = r.seq[r.i + 1];
   const works = r.seq.filter(x => x.type === 'work').length;
-  const counter = s.round ? (r.mode === 'circuito' ? `Estação ${s.round} · Volta ${s.cycle}` : `Volta ${s.round} de ${works}`) : r.label;
+  const counter = counterOf(r, s, works);
   const theme = s.type === 'work' ? s.theme : nx?.theme ? `Próxima: ${nx.theme}` : undefined;
   const total = r.seq.reduce((a, x) => a + x.dur, 0);
   const left = Math.max(0, r.remaining) + r.seq.slice(r.i + 1).reduce((a, x) => a + x.dur, 0);
@@ -44,7 +54,7 @@ function bgInfo(r: Run): BgInfo {
 function janelaInfo(r: Run): JanelaInfo {
   const s = r.seq[r.i], nx = r.seq[r.i + 1];
   const theme = s.type === 'work' ? s.theme : nx?.theme;
-  return { time: fmtClock(r.remaining), label: theme ?? phaseName(r.mode, s), color: LOOK[s.type].color };
+  return { time: fmtClock(r.remaining), label: theme ?? phaseName(r.mode, s), color: lookOf(s).color };
 }
 
 // A tela do treino é sempre escura, com o tecido na cor da fase, mesmo no tema claro.
@@ -97,7 +107,8 @@ function Treino() {
         Sound.cue('done', mode);
         Sound.say('Treino concluído. Oss!', mode);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-        saveHistory(r);
+        // O plano vai para os treinos pela tela de planejado x feito.
+        if (r.mode !== 'plano') saveHistory(r);
         RunStore.save(null);
         deactivateKeepAwake();
         Background.stop();
@@ -143,6 +154,16 @@ function Treino() {
   };
   const close = () => {
     const cur = runRef.current;
+    // Plano encerrado no meio: para o relógio e mostra o planejado x feito.
+    if (cur && !cur.finished && cur.mode === 'plano' && cur.plan) {
+      stopRun(cur);
+      RunStore.save(null);
+      deactivateKeepAwake();
+      Background.stop();
+      Janela.setAuto(false);
+      sync();
+      return;
+    }
     if (cur && !cur.finished) saveHistory(cur);
     RunStore.save(null);
     router.back();
@@ -161,17 +182,18 @@ function Treino() {
 
   if (r.finished) {
     if (compact) return <Mini color={C.fg} time="Oss!" label="Treino concluído" />;
+    if (r.mode === 'plano' && r.plan) return <Resumo run={r} onClose={close} landscape={landscape} />;
     return <Done run={r} onClose={close} landscape={landscape} />;
   }
 
-  const look = LOOK[s.type];
+  const look = lookOf(s);
   const name = phaseName(r.mode, s);
   const nx = r.seq[r.i + 1];
   const theme = s.type === 'work' ? s.theme : nx?.theme;
   const left = Math.max(0, r.remaining) + r.seq.slice(r.i + 1).reduce((a, x) => a + x.dur, 0);
   const doneRounds = r.seq.slice(0, r.i).filter(x => x.type === 'work').length;
   const fill = s.type === 'work' ? (doneRounds + (1 - Math.max(0, r.remaining) / s.dur)) / Math.max(1, workPhases.length) : doneRounds / Math.max(1, workPhases.length);
-  const counter = s.round ? (r.mode === 'circuito' ? `Estação ${s.round} · Volta ${s.cycle}` : `Volta ${s.round} de ${workPhases.length}`) : r.label;
+  const counter = counterOf(r, s, workPhases.length);
 
   if (compact) return <Mini color={look.color} time={fmtClock(r.remaining)} label={theme ?? name} />;
 

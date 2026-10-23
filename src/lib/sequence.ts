@@ -1,4 +1,5 @@
-export type Mode = 'combate' | 'circuito';
+// plano: um plano de treino da aba Planejar, com vários blocos (cada fase diz o próprio nome).
+export type Mode = 'combate' | 'circuito' | 'plano';
 export type PhaseType = 'prep' | 'work' | 'rest' | 'cycle' | 'relax';
 
 export type Phase = {
@@ -7,6 +8,13 @@ export type Phase = {
   round?: number;
   cycle?: number;
   theme?: string;
+  // Só nos planos: bloco e item (drill) de origem, nome na tela, cor de outra fase, contador e fala.
+  bi?: number;
+  item?: number;
+  name?: string;
+  look?: PhaseType;
+  tag?: string;
+  say?: string;
 };
 
 export type CombateConfig = { prep: number; work: number; rest: number; rounds: number; relax: number; themes: string[]; themeOrder: 'seq' | 'rand' };
@@ -42,7 +50,7 @@ export const CIRCUITO_PRESETS: CircuitoPreset[] = [
   } },
 ];
 
-export function buildSequence(mode: Mode, c: CombateConfig | CircuitoConfig): Phase[] {
+export function buildSequence(mode: Exclude<Mode, 'plano'>, c: CombateConfig | CircuitoConfig): Phase[] {
   const seq: Phase[] = [];
   const push = (type: PhaseType, dur: number, extra: Partial<Phase> = {}) => { if (dur > 0) seq.push({ type, dur, ...extra }); };
   push('prep', c.prep);
@@ -98,6 +106,7 @@ export function fmtClock(s: number) {
 }
 
 export function phaseName(mode: Mode, s: Phase) {
+  if (s.name) return s.name;
   switch (s.type) {
     case 'prep': return 'Preparar';
     case 'work': return mode === 'combate' ? 'Luta' : 'Exercício';

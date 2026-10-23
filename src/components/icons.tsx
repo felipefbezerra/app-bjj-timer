@@ -49,3 +49,14 @@ export const IconPip = ({ color = '#fff', size = 20 }: P) => (
     <Rect x={2.5} y={4.5} width={19} height={15} rx={2} /><Rect x={12} y={11.5} width={7} height={5} rx={1} fill={color} />
   </Svg>
 );
+export const IconPlanejar = ({ color = '#fff', size = 26 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.8}>
+    <Rect x={5} y={4} width={14} height={17} rx={2} /><Path d="M9 4V3h6v1M8.5 10h7M8.5 14h7M8.5 18h4" />
+  </Svg>
+);
+export const IconBack = ({ color = '#fff', size = 22 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}><Path d="M15 5l-7 7 7 7" /></Svg>
+);
+export const IconCheck = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.6}><Path d="M5 12.5l4.5 4.5L19 7.5" /></Svg>
+);

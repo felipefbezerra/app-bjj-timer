@@ -4,6 +4,7 @@ import { Alert, Pressable, TextInput, View } from 'react-native';
 import { Belt } from '@/components/belt';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
 import { Label, Panel, PrimaryButton, Screen, Split, Txt, useWide } from '@/components/ui';
+import { blockColor } from '@/lib/plano';
 import { useStore, type Profile, type Session, type SoundMode, type ThemeMode } from '@/lib/store';
 import { BELT_ORDER, BELTS, beltLook, F, useC } from '@/lib/theme';
 
@@ -75,7 +76,7 @@ export default function Treinos() {
   };
   const title = (h: Session) => {
     const unit = h.mode === 'circuito' ? (h.rounds === 1 ? 'estação' : 'estações') : (h.rounds === 1 ? 'volta' : 'voltas');
-    const kind = h.manual ? h.label : h.mode === 'circuito' ? 'Circuito' : 'Combate';
+    const kind = h.manual || h.mode === 'plano' ? h.label : h.mode === 'circuito' ? 'Circuito' : 'Combate';
     return `${kind}${h.rounds ? ` · ${h.rounds} ${unit}` : ''}${h.done ? '' : ' · parcial'}`;
   };
 
@@ -166,7 +167,7 @@ export default function Treinos() {
               return (
                 <Pressable key={h.t} onPress={() => setOpen({ s: h, confirm: false })} accessibilityRole="button" accessibilityHint="Ver detalhes ou excluir"
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.line }}>
-                  <View style={{ width: 6, height: 38, borderRadius: 3, backgroundColor: h.manual ? C.relax : h.mode === 'circuito' ? C.cycle : C.work }} />
+                  <View style={{ width: 6, height: 38, borderRadius: 3, backgroundColor: h.manual ? C.relax : h.mode === 'plano' ? blockColor('posicao', C.dark) : h.mode === 'circuito' ? C.cycle : C.work }} />
                   <View style={{ flex: 1 }}>
                     <Txt f="semi" size={20} caps numberOfLines={1}>{title(h)}</Txt>
                     <Txt f="med" size={14} color={C.muted} caps numberOfLines={1}>{when}{h.manual ? ' · registrado' : ''}{h.themes.length ? ` · ${h.themes.join(', ')}` : ''}</Txt>
@@ -281,11 +282,12 @@ export default function Treinos() {
           return <>
             <Label size={15}>{`${WD[d.getDay()]}, ${d.getDate()} de ${MONTHS[d.getMonth()].toLowerCase()} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`}</Label>
             <View style={{ flexDirection: 'row' }}>
-              <View style={{ flex: 1 }}><Txt f="num" size={34}>{hm(h.work)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.1}>{h.manual ? 'Duração' : h.mode === 'circuito' ? 'De exercício' : 'De luta'}</Txt></View>
+              <View style={{ flex: 1 }}><Txt f="num" size={34}>{hm(h.work)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.1}>{h.manual ? 'Duração' : h.mode === 'plano' ? (h.planned ? `De ${hm(h.planned)} planejados` : 'De treino') : h.mode === 'circuito' ? 'De exercício' : 'De luta'}</Txt></View>
               <View style={{ flex: 1 }}><Txt f="num" size={34}>{String(h.rounds)}</Txt><Txt f="med" size={13} color={C.muted} caps track={0.1}>{h.mode === 'circuito' ? 'Estações' : 'Voltas'}</Txt></View>
             </View>
             {h.themes.length > 0 && <Txt f="med" size={16} color={C.soft}>{h.themes.join(', ')}</Txt>}
-            <Txt f="reg" size={14} color={C.muted}>{h.manual ? 'Registrado à mão.' : `Feito com o temporizador (${h.label}).`}{open.confirm ? ' Toque em “Confirmar” para excluir de vez.' : ''}</Txt>
+            {!!h.note && <Txt f="reg" size={16} color={C.soft}>{`“${h.note}”`}</Txt>}
+            <Txt f="reg" size={14} color={C.muted}>{h.manual ? 'Registrado à mão.' : h.mode === 'plano' ? 'Plano de treino feito com o temporizador.' : `Feito com o temporizador (${h.label}).`}{open.confirm ? ' Toque em “Confirmar” para excluir de vez.' : ''}</Txt>
           </>;
         })()}
       </Sheet>
