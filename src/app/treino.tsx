@@ -10,13 +10,12 @@ import { Belt } from '@/components/belt';
 import { IconClose, IconNext, IconPip, IconPrev, IconShare } from '@/components/icons';
 import { Fabric, IconButton, Label, Panel, PrimaryButton, Txt } from '@/components/ui';
 import { Background, type BgInfo } from '@/lib/background';
+import { Janela, type JanelaInfo } from '@/lib/janela';
 import { jump, phaseSpeech, RunStore, step, clearPendingRun, peekPendingRun, togglePause, type Run, type RunEvent } from '@/lib/runner';
 import { fmtClock, phaseName, type PhaseType } from '@/lib/sequence';
 import { Sound } from '@/lib/sound';
 import { useStore } from '@/lib/store';
 import { DARK as C, ThemeCtx, type TextureKey } from '@/lib/theme';
-
-import { TimerPip } from '../../modules/timer-pip';
 
 const LOOK: Record<PhaseType, { color: string; tone: TextureKey; soft: string }> = {
   prep: { color: C.prep, tone: 'amarelo', soft: '#c9c3a6' },
@@ -41,6 +40,13 @@ function bgInfo(r: Run): BgInfo {
   };
 }
 
+// Na janelinha: só o tempo e a posição (ou o nome da fase quando o treino não tem posições).
+function janelaInfo(r: Run): JanelaInfo {
+  const s = r.seq[r.i], nx = r.seq[r.i + 1];
+  const theme = s.type === 'work' ? s.theme : nx?.theme;
+  return { time: fmtClock(r.remaining), label: theme ?? phaseName(r.mode, s), color: LOOK[s.type].color };
+}
+
 // A tela do treino é sempre escura, com o tecido na cor da fase, mesmo no tema claro.
 export default function TreinoScreen() {
   return (
@@ -55,7 +61,9 @@ function Treino() {
   const st = useStore();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
-  const [pipOk] = useState(() => TimerPip.isSupported());
+  const [pipOk] = useState(() => Janela.isSupported());
+  const [inPip, setInPip] = useState(() => Janela.isActive());
+  useEffect(() => Janela.onChange(setInPip), []);
   // O motor mexe no treino guardado em runRef; a tela desenha uma cópia (view) a cada passo.
   const [run0] = useState(() => peekPendingRun());
   const runRef = useRef<Run | null>(run0);
@@ -93,7 +101,8 @@ function Treino() {
         RunStore.save(null);
         deactivateKeepAwake();
         Background.stop();
-        TimerPip.setEnabled(false);
+        Janela.setAuto(false);
+        Janela.update({ time: 'Oss!', label: 'Treino concluído', color: C.fg });
       }
     }
   }, [saveHistory]);
@@ -107,20 +116,20 @@ function Treino() {
     // Android: serviço com notificação para seguir contando e falando com outro app aberto,
     // e a janelinha flutuante quando você sai do app.
     Background.start(bgInfo(r));
-    TimerPip.setEnabled(true);
+    Janela.setAuto(true);
     RunStore.save(r);
     let lastSave = Date.now();
     const id = setInterval(() => {
       handle(r, step(r));
       if (Date.now() - lastSave > 5000) { RunStore.save(r); lastSave = Date.now(); }
-      if (!r.finished) Background.update(bgInfo(r));
+      if (!r.finished) { Background.update(bgInfo(r)); Janela.update(janelaInfo(r)); }
       sync();
     }, 250);
     const sub = AppState.addEventListener('change', s => {
       if (s === 'active') { handle(r, step(r)); sync(); }
       else RunStore.save(r);
     });
-    return () => { clearInterval(id); sub.remove(); deactivateKeepAwake(); Sound.stop(); Background.stop(); TimerPip.setEnabled(false); };
+    return () => { clearInterval(id); sub.remove(); deactivateKeepAwake(); Sound.stop(); Background.stop(); Janela.setAuto(false); Janela.close(); };
   }, [handle, sync]);
 
   const act = (fn: (cur: Run) => RunEvent[] | void) => {
@@ -129,7 +138,7 @@ function Treino() {
     const ev = fn(cur);
     if (ev) handle(cur, ev);
     RunStore.save(cur);
-    if (!cur.finished) Background.update(bgInfo(cur));
+    if (!cur.finished) { Background.update(bgInfo(cur)); Janela.update(janelaInfo(cur)); }
     sync();
   };
   const close = () => {
@@ -146,12 +155,12 @@ function Treino() {
   const workPhases = r.seq.filter(s => s.type === 'work');
   const s = r.seq[r.i];
 
-  // Janelinha flutuante (Android): só a fase, o tempo e a ronda.
-  const compact = height < 300 && width < 640;
+  // Janelinha flutuante (Android): a tela encolhe e mostra só o tempo e a posição.
+  const compact = (Janela.inline && inPip) || (height < 300 && width < 640);
   const landscape = !compact && width > height;
 
   if (r.finished) {
-    if (compact) return <Mini tone="escuro" color={C.fg} name="Concluído" time="Oss!" sub={r.label} />;
+    if (compact) return <Mini color={C.fg} time="Oss!" label="Treino concluído" />;
     return <Done run={r} onClose={close} landscape={landscape} />;
   }
 
@@ -164,14 +173,14 @@ function Treino() {
   const fill = s.type === 'work' ? (doneRounds + (1 - Math.max(0, r.remaining) / s.dur)) / Math.max(1, workPhases.length) : doneRounds / Math.max(1, workPhases.length);
   const counter = s.round ? (r.mode === 'circuito' ? `Estação ${s.round} · Volta ${s.cycle}` : `Ronda ${s.round} de ${workPhases.length}`) : r.label;
 
-  if (compact) return <Mini tone={look.tone} color={look.color} name={r.paused ? `${name} · pausado` : name} time={fmtClock(r.remaining)} sub={theme && s.type === 'work' ? theme : counter} />;
+  if (compact) return <Mini color={look.color} time={fmtClock(r.remaining)} label={theme ?? name} />;
 
   const clockSize = landscape ? Math.min(height * 0.42, width * 0.2) : 150;
 
   const header = (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
       <Txt f="med" size={15} color={look.soft} caps track={0.14} numberOfLines={1} style={{ flex: 1 }}>{r.label}</Txt>
-      {pipOk && <IconButton label="Abrir janelinha" onPress={() => TimerPip.enter()}><IconPip color={C.fg} /></IconButton>}
+      {pipOk && <IconButton label={inPip ? 'Fechar janelinha' : 'Abrir janelinha'} onPress={() => { Janela.update(janelaInfo(r)); Janela.open(); }}><IconPip color={C.fg} /></IconButton>}
       <IconButton label="Encerrar treino" onPress={close}><IconClose color={C.fg} /></IconButton>
     </View>
   );
@@ -242,18 +251,15 @@ function Treino() {
   );
 }
 
-function Mini({ tone, color, name, time, sub }: { tone: TextureKey; color: string; name: string; time: string; sub?: string }) {
-  const { height } = useWindowDimensions();
-  const size = Math.max(28, height * 0.42);
+function Mini({ color, time, label }: { color: string; time: string; label: string }) {
+  const { width, height } = useWindowDimensions();
+  const size = Math.round(Math.min(height * 0.5, width * 0.3));
+  const small = Math.round(Math.max(11, Math.min(height * 0.15, width * 0.08)));
   return (
-    <Fabric tone={tone}>
-      <View style={{ height: 4, backgroundColor: color }} />
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 }}>
-        <Txt f="bold" size={Math.max(11, height * 0.1)} color={color} caps track={0.14} numberOfLines={1}>{name}</Txt>
-        <Txt f="num" size={size} color={color} style={{ lineHeight: size * 1.1, fontVariant: ['tabular-nums'] }} adjustsFontSizeToFit numberOfLines={1}>{time}</Txt>
-        {sub ? <Txt f="med" size={Math.max(10, height * 0.09)} caps track={0.08} numberOfLines={1}>{sub}</Txt> : null}
-      </View>
-    </Fabric>
+    <View style={{ flex: 1, backgroundColor: C.ground, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 }}>
+      <Txt f="num" size={size} color={color} numberOfLines={1} style={{ lineHeight: Math.round(size * 1.15), fontVariant: ['tabular-nums'] }}>{time}</Txt>
+      <Txt f="bold" size={small} caps track={0.06} numberOfLines={1} style={{ lineHeight: Math.round(small * 1.2) }}>{label}</Txt>
+    </View>
   );
 }
 

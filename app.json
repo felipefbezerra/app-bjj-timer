@@ -31,7 +31,9 @@
     },
     "web": {
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "lang": "pt-BR",
+      "themeColor": "#111315",
+      "description": "Temporizador de combate, circuito e cronômetro para treinos e lutas de jiu-jitsu."
     },
     "plugins": [
       "expo-router",

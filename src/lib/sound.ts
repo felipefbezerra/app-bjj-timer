@@ -30,6 +30,7 @@ async function ensure() {
 }
 
 export const Sound = {
+  prime() {},
   async start() {
     await ensure();
     try { players.silence?.play(); } catch {}
