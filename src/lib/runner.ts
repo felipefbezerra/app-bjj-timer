@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { type Plan } from './plano';
 import { type Mode, type Phase } from './sequence';
 
 // Estado de um treino em andamento. O relógio usa a hora real (Date.now), então se o celular
@@ -22,6 +23,7 @@ export type Run = {
   lastTick: number | null;
   w30: boolean;
   w10: boolean;
+  plan?: Plan;         // plano de treino rodando (para o resumo de planejado x feito)
 };
 
 export type RunEvent =
@@ -38,9 +40,9 @@ export function setPendingRun(r: Run) { pending = r; }
 export function peekPendingRun() { return pending; }
 export function clearPendingRun(r: Run) { if (pending === r) pending = null; }
 
-export function newRun(mode: Mode, label: string, seq: Phase[]): Run {
+export function newRun(mode: Mode, label: string, seq: Phase[], plan?: Plan): Run {
   const now = Date.now();
-  return { mode, label, seq, i: 0, paused: false, finished: false, remaining: seq[0].dur, endAt: now + seq[0].dur * 1000,
+  return { mode, label, seq, plan, i: 0, paused: false, finished: false, remaining: seq[0].dur, endAt: now + seq[0].dur * 1000,
     lastNow: now, startedAt: now, work: 0, rounds: 0, done: [], counted: [], lastTick: null, w30: false, w10: false };
 }
 
@@ -90,6 +92,14 @@ export function togglePause(r: Run) {
   if (!r.paused) { r.endAt = Date.now() + r.remaining * 1000; r.lastNow = Date.now(); }
 }
 
+// Encerra antes do fim (plano): conta a fase atual se passou da metade e para o relógio.
+export function stopRun(r: Run) {
+  if (r.finished) return;
+  if (!r.paused) r.remaining = Math.max(0, (r.endAt - Date.now()) / 1000);
+  countRound(r, false);
+  r.finished = true;
+}
+
 export function jump(r: Run, dir: 1 | -1): RunEvent[] {
   if (r.finished) return [];
   const s = r.seq[r.i];
@@ -108,6 +118,7 @@ export function jump(r: Run, dir: 1 | -1): RunEvent[] {
 
 export function phaseSpeech(r: Run) {
   const s = r.seq[r.i], nx = r.seq[r.i + 1];
+  if (s.say) return s.type === 'cycle' && nx?.theme ? `${s.say}. Próxima: ${nx.theme}` : s.say;
   if (s.type === 'prep') return 'Preparar';
   if (s.type === 'work') {
     const rounds = r.seq.filter(x => x.type === 'work').length;
@@ -115,7 +126,7 @@ export function phaseSpeech(r: Run) {
     return [last ? 'Última volta' : '', s.theme ?? '', r.mode === 'combate' ? 'Combate!' : 'Valendo!'].filter(Boolean).join('. ');
   }
   if (s.type === 'rest' || s.type === 'cycle') {
-    const base = s.type === 'cycle' ? 'Tempo! Descanso entre voltas' : 'Tempo! Descanso';
+    const base = s.type === 'cycle' ? 'Tempo! Descanso entre voltas' : `Tempo! ${s.name ?? 'Descanso'}`;
     return nx?.theme ? `${base}. Próxima: ${nx.theme}` : base;
   }
   if (s.type === 'relax') return 'Tempo! Relaxe';

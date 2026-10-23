@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { readLegacy } from './legacy';
+import { type Plan } from './plano';
 import { BELTS, type BeltKey } from './theme';
 import { DEFAULT_CIRCUITO, type CircuitoConfig, type CircuitoPresetId, type CombateConfig, type Mode } from './sequence';
 
@@ -9,7 +10,8 @@ export type Profile = { name: string; belt: BeltKey; degrees: number };
 export type SoundMode = 'voice' | 'beep' | 'mute';
 export type ThemeMode = 'auto' | 'light' | 'dark';
 // manual: treino registrado à mão na aba Treinos (aula, rola etc.), sem usar o temporizador.
-export type Session = { t: number; mode: Mode; work: number; rounds: number; themes: string[]; done: boolean; label: string; manual?: boolean };
+// planned e note: só nos planos (tempo planejado e o "como foi").
+export type Session = { t: number; mode: Mode; work: number; rounds: number; themes: string[]; done: boolean; label: string; manual?: boolean; planned?: number; note?: string };
 export type PresetId = 'aula' | 'competicao' | 'rola' | 'posicao' | 'custom';
 
 type Data = {
@@ -25,6 +27,8 @@ type Data = {
   history: Session[];
   // Posições criadas pela pessoa, além da lista padrão.
   positions: string[];
+  // Planos de treino da aba Planejar.
+  plans: Plan[];
 };
 
 export const DEFAULT_CUSTOM: CombateConfig = { prep: 10, work: 300, rest: 60, rounds: 5, relax: 0, themes: [], themeOrder: 'seq' };
@@ -40,6 +44,7 @@ const DEFAULTS: Data = {
   circuitoPreset: 'custom',
   history: [],
   positions: [],
+  plans: [],
 };
 
 const KEY = 'bjj.data.v1';
@@ -65,6 +70,8 @@ type Store = Data & {
   set: (patch: Partial<Data>) => void;
   addSession: (s: Session) => void;
   removeSession: (t: number) => void;
+  savePlan: (p: Plan) => void;
+  removePlan: (id: string) => void;
 };
 
 const Ctx = createContext<Store | null>(null);
@@ -92,6 +99,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     set: patch => setData(d => ({ ...d, ...patch })),
     addSession: s => setData(d => ({ ...d, history: [...d.history, s].slice(-1000) })),
     removeSession: t => setData(d => ({ ...d, history: d.history.filter(h => h.t !== t) })),
+    savePlan: p => setData(d => ({ ...d, plans: d.plans.some(x => x.id === p.id) ? d.plans.map(x => (x.id === p.id ? p : x)) : [...d.plans, p] })),
+    removePlan: id => setData(d => ({ ...d, plans: d.plans.filter(x => x.id !== id) })),
   }), [data, ready]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
