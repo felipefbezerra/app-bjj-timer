@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { Belt } from '@/components/belt';
 import { IconPlay } from '@/components/icons';
+import { PositionsSheet } from '@/components/positions';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
 import { Label, Panel, PrimaryButton, Screen, Split, Stat, Txt, useWide } from '@/components/ui';
 import { newRun, setPendingRun } from '@/lib/runner';
@@ -21,6 +22,10 @@ export default function Combate() {
   const c = sel.config;
   const [edit, setEdit] = useState<CombateConfig | null>(null);
   const wide = useWide();
+  const [picking, setPicking] = useState(false);
+
+  // Mudar o treino escolhido salva no "Meu treino", como no Ajustar.
+  const save = (cfg: CombateConfig) => st.set({ custom: cfg, preset: 'custom' });
 
   const start = () => {
     const seq = buildSequence('combate', c);
@@ -80,7 +85,14 @@ export default function Combate() {
             <Stat value={c.rest ? fmtClock(c.rest) : '—'} label="Descanso" color={C.rest} />
             <Stat value={String(c.rounds)} label="Rondas" />
           </View>
-          {c.themes.length > 0 && <Txt f="med" size={15} color={C.soft}>Temas: {c.themes.join(', ')}</Txt>}
+          <Pressable accessibilityRole="button" accessibilityLabel="Escolher posições" onPress={() => setPicking(true)}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderTopWidth: 1, borderTopColor: C.line, paddingTop: 10 }}>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Label>Posições</Label>
+              <Txt f="med" size={16} color={c.themes.length ? C.fg : C.muted} numberOfLines={1}>{c.themes.length ? c.themes.join(', ') : 'Sem posição definida'}</Txt>
+            </View>
+            <Txt f="semi" size={15} color={b.accent} caps track={0.08}>{!c.themes.length ? 'Escolher' : c.themeOrder === 'rand' ? 'Sorteadas' : 'Em ordem'}</Txt>
+          </Pressable>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: C.line, paddingTop: 10 }}>
             <Label>Duração total</Label>
             <Txt f="med" size={14} caps track={0.1}>{fmtClock(totalSeconds(buildSequence('combate', c)))}</Txt>
@@ -92,8 +104,14 @@ export default function Combate() {
         </View>
       </>} flexLeft={1.25} />
 
+      {picking && (
+        <PositionsSheet themes={c.themes} order={c.themeOrder} custom={st.positions} accent={b.accent} ink={b.ink}
+          onClose={() => setPicking(false)} onCustom={positions => st.set({ positions })}
+          onSave={(themes, themeOrder) => { save({ ...c, themes, themeOrder }); setPicking(false); }} />
+      )}
+
       <Sheet open={!!edit} title="Ajustar treino" onClose={() => setEdit(null)}
-        actions={<SheetActions onCancel={() => setEdit(null)} onOk={() => { if (edit) st.set({ custom: edit, preset: 'custom' }); setEdit(null); }} okLabel="Guardar" />}>
+        actions={<SheetActions onCancel={() => setEdit(null)} onOk={() => { if (edit) save(edit); setEdit(null); }} okLabel="Guardar" />}>
         {edit && <>
           <Stepper label="Preparar" color={C.prep} value={fmtClock(edit.prep)} onMinus={() => setEdit({ ...edit, prep: Math.max(0, edit.prep - 5) })} onPlus={() => setEdit({ ...edit, prep: edit.prep + 5 })} />
           <Stepper label="Luta" color={C.work} value={fmtClock(edit.work)} onMinus={() => setEdit({ ...edit, work: Math.max(30, edit.work - 30) })} onPlus={() => setEdit({ ...edit, work: edit.work + 30 })} />

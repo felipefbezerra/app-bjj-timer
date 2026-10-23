@@ -1,7 +1,8 @@
+import { DEFAULT_CUSTOM } from './store';
 import { BELTS, type BeltKey } from './theme';
 
 // Quando a versão web substitui o site antigo no mesmo endereço, traz o que ficou salvo nele:
-// histórico de treinos, faixa e graus, modo de som e tema. Roda só na primeira abertura.
+// histórico de treinos, faixa e graus, modo de som, tema e posições. Roda só na primeira abertura.
 function get(k: string): unknown {
   try { return JSON.parse(localStorage.getItem(k) ?? 'null'); } catch { return null; }
 }
@@ -12,7 +13,8 @@ export function readLegacy(): Record<string, unknown> | null {
   const history = get('bjj.history') as Old[] | null;
   const belt = get('bjj.belt') as { k?: string; degrees?: number } | null;
   const sound = get('bjj.sound'), theme = get('bjj.theme');
-  if (!history?.length && !belt && !sound && !theme) return null;
+  const positions = get('bjj.positions'), rondas = get('bjj.rondas') as { themes?: unknown; themeOrder?: unknown } | null;
+  if (!history?.length && !belt && !sound && !theme && !positions && !rondas) return null;
   const out: Record<string, unknown> = {};
   if (Array.isArray(history)) {
     out.history = history.filter(h => typeof h?.t === 'number').map(h => {
@@ -26,5 +28,10 @@ export function readLegacy(): Record<string, unknown> | null {
   }
   if (sound === 'voice' || sound === 'beep' || sound === 'mute') out.sound = sound;
   if (theme === 'auto' || theme === 'light' || theme === 'dark') out.theme = theme;
+  const strs = (x: unknown) => Array.isArray(x) ? x.filter((t): t is string => typeof t === 'string' && !!t.trim()) : [];
+  if (strs(positions).length) out.positions = strs(positions);
+  // As posições escolhidas no Combate do site antigo vão para o "Meu treino".
+  const themes = strs(rondas?.themes);
+  if (themes.length) out.custom = { ...DEFAULT_CUSTOM, themes, themeOrder: rondas?.themeOrder === 'rand' ? 'rand' : 'seq' };
   return out;
 }
