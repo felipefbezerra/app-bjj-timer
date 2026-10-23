@@ -21,7 +21,11 @@ type Data = {
   custom: CombateConfig;
   circuito: CircuitoConfig;
   history: Session[];
+  // Posições criadas pela pessoa, além da lista padrão.
+  positions: string[];
 };
+
+export const DEFAULT_CUSTOM: CombateConfig = { prep: 10, work: 300, rest: 60, rounds: 5, relax: 0, themes: [], themeOrder: 'seq' };
 
 const DEFAULTS: Data = {
   profile: { name: '', belt: 'branca', degrees: 0 },
@@ -29,9 +33,10 @@ const DEFAULTS: Data = {
   theme: 'auto',
   weeklyGoal: 4,
   preset: 'aula',
-  custom: { prep: 10, work: 300, rest: 60, rounds: 5, relax: 0, themes: [], themeOrder: 'seq' },
+  custom: DEFAULT_CUSTOM,
   circuito: DEFAULT_CIRCUITO,
   history: [],
+  positions: [],
 };
 
 const KEY = 'bjj.data.v1';

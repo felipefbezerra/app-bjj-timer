@@ -37,14 +37,30 @@ export function buildSequence(mode: Mode, c: CombateConfig | CircuitoConfig): Ph
     }
   } else {
     const cb = c as CombateConfig;
-    const themes = cb.themeOrder === 'rand' ? shuffle(cb.themes) : cb.themes;
+    const themes = pickThemes(cb.themes, cb.themeOrder, cb.rounds);
     for (let r = 1; r <= cb.rounds; r++) {
-      push('work', cb.work, { round: r, theme: themes.length ? themes[(r - 1) % themes.length] : undefined });
+      push('work', cb.work, { round: r, theme: themes[r - 1] });
       if (r < cb.rounds) push('rest', cb.rest, { round: r });
     }
   }
   push('relax', c.relax);
   return seq;
+}
+
+// Uma posição por ronda. Sorteando, todas saem antes de alguma repetir, e a mesma nunca vem duas vezes seguidas.
+export function pickThemes(list: string[], order: 'seq' | 'rand', rounds: number): (string | undefined)[] {
+  if (!list.length) return [];
+  if (order !== 'rand') return Array.from({ length: rounds }, (_, i) => list[i % list.length]);
+  const out: string[] = [];
+  let bag: string[] = [];
+  while (out.length < rounds) {
+    if (!bag.length) {
+      bag = shuffle(list);
+      if (bag.length > 1 && bag[0] === out[out.length - 1]) bag.push(bag.shift()!);
+    }
+    out.push(bag.shift()!);
+  }
+  return out;
 }
 
 function shuffle<T>(xs: T[]): T[] {
