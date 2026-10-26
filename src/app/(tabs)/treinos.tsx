@@ -6,7 +6,7 @@ import { Sheet, SheetActions, Stepper } from '@/components/sheet';
 import { Label, Panel, PrimaryButton, Screen, Split, Txt, useWide } from '@/components/ui';
 import { blockColor } from '@/lib/plano';
 import { useStore, type Profile, type Session, type SoundMode, type ThemeMode } from '@/lib/store';
-import { BELT_ORDER, BELTS, beltLook, F, textSize, useC } from '@/lib/theme';
+import { BELT_ORDER, BELTS, beltLook, F, useC } from '@/lib/theme';
 
 const MONTHS = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const WD = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -197,7 +197,7 @@ export default function Treinos() {
           <View style={{ gap: 6 }}>
             <Label size={13}>Nome ou apelido</Label>
             <TextInput value={profile.name} onChangeText={name => setProfile({ ...profile, name })} maxLength={24} placeholder="Como quer ser chamado" placeholderTextColor={C.muted}
-              style={{ fontFamily: F.med, fontSize: textSize(20), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
+              style={{ fontFamily: F.med, fontSize: 20, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
           </View>
           <Label size={13}>Faixa</Label>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -240,7 +240,7 @@ export default function Treinos() {
             </Pressable>
           ))}
         </View>
-        <Txt f="reg" size={14} color={C.muted}>Automático segue o tema claro ou escuro do celular. A tela do treino fica sempre escura, com o tecido na cor da fase.</Txt>
+        <Txt f="reg" size={14} color={C.muted}>Automático segue o tema claro ou escuro do celular. A tela do treino fica sempre escura, com o fundo na cor da fase.</Txt>
       </Sheet>
 
       <Sheet open={!!draft} title="Registrar treino" onClose={() => setDraft(null)}

@@ -9,16 +9,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Belt } from '@/components/belt';
 import { IconClose, IconNext, IconPip, IconPrev, IconShare } from '@/components/icons';
 import { Resumo } from '@/components/resumo';
-import { Fabric, IconButton, Label, Panel, PrimaryButton, Txt } from '@/components/ui';
+import { Backdrop, IconButton, Label, Panel, PrimaryButton, Txt } from '@/components/ui';
 import { Background, type BgInfo } from '@/lib/background';
 import { Janela, type JanelaInfo } from '@/lib/janela';
 import { jump, phaseSpeech, RunStore, step, stopRun, clearPendingRun, peekPendingRun, togglePause, type Run, type RunEvent } from '@/lib/runner';
 import { fmtClock, phaseName, type Phase, type PhaseType } from '@/lib/sequence';
 import { Sound } from '@/lib/sound';
 import { useStore } from '@/lib/store';
-import { DARK as C, ThemeCtx, type TextureKey } from '@/lib/theme';
+import { DARK as C, ThemeCtx, type ToneKey } from '@/lib/theme';
 
-const LOOK: Record<PhaseType, { color: string; tone: TextureKey; soft: string }> = {
+const LOOK: Record<PhaseType, { color: string; tone: ToneKey; soft: string }> = {
   prep: { color: C.prep, tone: 'amarelo', soft: '#c9c3a6' },
   work: { color: C.work, tone: 'verde', soft: '#b9c2b0' },
   rest: { color: C.rest, tone: 'vermelho', soft: '#c9b5b1' },
@@ -57,7 +57,7 @@ function janelaInfo(r: Run): JanelaInfo {
   return { time: fmtClock(r.remaining), label: theme ?? phaseName(r.mode, s), color: lookOf(s).color };
 }
 
-// A tela do treino é sempre escura, com o tecido na cor da fase, mesmo no tema claro.
+// A tela do treino é sempre escura, com o fundo na cor da fase, mesmo no tema claro.
 export default function TreinoScreen() {
   return (
     <ThemeCtx.Provider value={C}>
@@ -250,7 +250,7 @@ function Treino() {
   const pad = { paddingTop: insets.top + (landscape ? 8 : 12), paddingBottom: Math.max(landscape ? 12 : 24, insets.bottom + 8), paddingLeft: Math.max(20, insets.left + 12), paddingRight: Math.max(20, insets.right + 12) };
 
   return (
-    <Fabric tone={look.tone}>
+    <Backdrop tone={look.tone}>
       <View style={{ height: 6, backgroundColor: look.color }} />
       {landscape ? (
         <View style={{ flex: 1, flexDirection: 'row', gap: 24, ...pad }}>
@@ -269,7 +269,7 @@ function Treino() {
           {controls}
         </View>
       )}
-    </Fabric>
+    </Backdrop>
   );
 }
 
@@ -333,10 +333,10 @@ function Done({ run, onClose, landscape }: { run: Run; onClose: () => void; land
   );
 
   return (
-    <Fabric>
+    <Backdrop>
       {landscape
         ? <ScrollView contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: Math.max(20, insets.bottom + 10), paddingLeft: Math.max(20, insets.left + 12), paddingRight: Math.max(20, insets.right + 12), gap: 16 }}>{body}</ScrollView>
         : <View style={{ flex: 1, paddingTop: insets.top + 28, paddingBottom: Math.max(30, insets.bottom + 10), paddingHorizontal: 20, gap: 18 }}>{body}</View>}
-    </Fabric>
+    </Backdrop>
   );
 }

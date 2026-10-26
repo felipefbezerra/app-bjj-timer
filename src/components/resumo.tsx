@@ -6,10 +6,10 @@ import { blockColor, blockSeconds, blockTarget, BLOCK_NAME, doneFromRun, doneLin
 import { type Run } from '@/lib/runner';
 import { fmtClock } from '@/lib/sequence';
 import { useStore } from '@/lib/store';
-import { DARK as C, F, textSize } from '@/lib/theme';
+import { DARK as C, F } from '@/lib/theme';
 import { IconCheck } from './icons';
 import { PlanBar } from './plano';
-import { Fabric, Label, Panel, PrimaryButton, Txt } from './ui';
+import { Backdrop, Label, Panel, PrimaryButton, Txt } from './ui';
 
 const WD = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MON = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -115,7 +115,7 @@ export function Resumo({ run, onClose, landscape }: { run: Run; onClose: () => v
         <Label>Como foi</Label>
         <TextInput value={note} onChangeText={setNote} multiline maxLength={400} placeholder="Ex.: cansei no 5º combate, a passagem saiu bem" placeholderTextColor={C.muted}
           accessibilityLabel="Como foi o treino"
-          style={{ fontFamily: F.med, fontSize: textSize(18), color: C.fg, backgroundColor: C.panel, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10, minHeight: 80, textAlignVertical: 'top' }} />
+          style={{ fontFamily: F.med, fontSize: 18, color: C.fg, backgroundColor: C.panel, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10, minHeight: 80, textAlignVertical: 'top' }} />
       </View>
       <View style={{ gap: 10 }}>
         <PrimaryButton label="Salvar nos treinos" height={60} onPress={save} />
@@ -126,7 +126,7 @@ export function Resumo({ run, onClose, landscape }: { run: Run; onClose: () => v
 
   const pad = { paddingTop: insets.top + (landscape ? 16 : 24), paddingBottom: Math.max(24, insets.bottom + 10), paddingLeft: Math.max(20, insets.left + 12), paddingRight: Math.max(20, insets.right + 12) };
   return (
-    <Fabric>
+    <Backdrop>
       {landscape ? (
         <View style={{ flex: 1, flexDirection: 'row', gap: 20, width: '100%', maxWidth: 1100, alignSelf: 'center' }}>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ ...pad, paddingRight: 0, gap: 16 }}>{summary}</ScrollView>
@@ -135,7 +135,7 @@ export function Resumo({ run, onClose, landscape }: { run: Run; onClose: () => v
       ) : (
         <ScrollView contentContainerStyle={{ ...pad, gap: 18, width: '100%', maxWidth: 640, alignSelf: 'center' }} keyboardShouldPersistTaps="handled">{summary}{checklist}</ScrollView>
       )}
-    </Fabric>
+    </Backdrop>
   );
 }
 

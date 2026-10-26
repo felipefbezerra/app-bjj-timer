@@ -8,7 +8,7 @@ import { blockChip, blockColor, blockDetail, blockSeconds, BLOCK_NAME, hmParts, 
 import { planHtml } from '@/lib/planoPdf';
 import { useStore } from '@/lib/store';
 import { fmtClock } from '@/lib/sequence';
-import { beltLook, BELTS, F, textSize, useC } from '@/lib/theme';
+import { beltLook, BELTS, F, useC } from '@/lib/theme';
 import { Belt } from './belt';
 import { PlanBar } from './plano';
 import { Sheet } from './sheet';
@@ -198,7 +198,7 @@ export function ImportSheet({ onClose, onImported }: { onClose: () => void; onIm
         <Label size={13}>Link do plano</Label>
         <TextInput value={text} onChangeText={t => { setText(t); setErr(''); }} placeholder="Cole aqui o link ou a mensagem" placeholderTextColor={C.muted}
           autoCapitalize="none" autoCorrect={false} multiline numberOfLines={2} accessibilityLabel="Link do plano"
-          style={{ fontFamily: F.med, fontSize: textSize(16), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: sh ? b.accent : C.line, paddingHorizontal: 12, paddingVertical: 10, maxHeight: 84 }} />
+          style={{ fontFamily: F.med, fontSize: 16, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: sh ? b.accent : C.line, paddingHorizontal: 12, paddingVertical: 10, maxHeight: 84 }} />
       </View>
       {sh && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, paddingHorizontal: 14, borderRadius: 14, backgroundColor: C.dark ? '#24282c' : 'rgba(255,255,255,.9)' }}>

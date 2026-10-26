@@ -1,44 +1,40 @@
 import type { ReactNode } from 'react';
-import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { F, textSize, TEXTURES, useC, type TextureKey } from '@/lib/theme';
+import { F, TONES, useC, type ToneKey } from '@/lib/theme';
 
 type TxtProps = TextProps & { f?: keyof typeof F; size?: number; color?: string; caps?: boolean; track?: number; style?: StyleProp<TextStyle> };
 
 // Texto na tipografia do app. caps + track dão o visual de etiqueta (maiúsculas espaçadas).
-// "title" é a Anton dos títulos e nomes; num e numMed, a Oswald dos números; o resto é Inter.
+// "title" é a Anton dos títulos e nomes, com folga em cima para os acentos (Ô, Ç) não encostarem.
 export function Txt({ f = 'med', size = 16, color, caps, track, style, ...rest }: TxtProps) {
   const C = useC();
-  const kind = f === 'title' ? 'title' : f === 'num' || f === 'numMed' ? 'num' : 'text';
-  const fs = kind === 'title' ? Math.round(size * 0.95) : kind === 'text' ? textSize(size) : size;
-  const tr = kind === 'title' ? 0.01 : kind === 'text' && track ? Math.min(track, 0.06) : track;
+  const title = f === 'title';
+  const fs = title ? Math.round(size * 0.95) : size;
+  const tr = title ? 0.01 : track;
   return (
     <Text
       {...rest}
       style={[{ fontFamily: F[f], fontSize: fs, color: color ?? C.fg, letterSpacing: tr ? fs * tr : undefined, textTransform: caps ? 'uppercase' : 'none',
-        lineHeight: kind === 'title' ? Math.round(fs * 1.3) : undefined }, style]}
+        lineHeight: title ? Math.round(fs * 1.3) : undefined }, style]}
     />
   );
 }
 
-// Fundo de tecido de kimono, na cor da fase.
-export function Fabric({ tone, children, style }: { tone?: TextureKey; children: ReactNode; style?: StyleProp<ViewStyle> }) {
+// Fundo liso da tela; no treino, na cor da fase.
+export function Backdrop({ tone, children, style }: { tone?: ToneKey; children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const C = useC();
-  return (
-    <ImageBackground source={TEXTURES[tone ?? C.fabric]} resizeMode="cover" imageStyle={{ width: "100%", height: "100%" }} style={[{ flex: 1, backgroundColor: C.ground }, style]}>
-      {children}
-    </ImageBackground>
-  );
+  return <View style={[{ flex: 1, backgroundColor: tone ? TONES[tone] : C.ground }, style]}>{children}</View>;
 }
 
 export function Screen({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
   // Laterais seguras para o entalhe da câmera com o celular deitado.
   return (
-    <Fabric>
+    <Backdrop>
       <View style={{ flex: 1, paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }}>{children}</View>
-    </Fabric>
+    </Backdrop>
   );
 }
 
@@ -88,7 +84,7 @@ export function PrimaryButton({ label, onPress, icon, height = 64, light = true 
       onPress={onPress}
       style={({ pressed }) => [s.primary, { height, borderRadius: height / 2, backgroundColor: light ? C.fg : 'transparent', borderWidth: light ? 0 : 1, borderColor: C.line2, opacity: pressed ? 0.85 : 1 }]}>
       {icon}
-      <Txt f="bold" size={height > 56 ? 20 : 15} color={light ? C.ink : C.fg} caps track={0.04} numberOfLines={1} adjustsFontSizeToFit style={{ flexShrink: 1 }}>{label}</Txt>
+      <Txt f="bold" size={height > 56 ? 22 : 16} color={light ? C.ink : C.fg} caps track={height > 56 ? 0.12 : 0.08} numberOfLines={1} adjustsFontSizeToFit style={{ flexShrink: 1 }}>{label}</Txt>
     </Pressable>
   );
 }

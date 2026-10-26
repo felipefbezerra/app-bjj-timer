@@ -57,7 +57,7 @@ async function open() {
       // Leva as fontes do app (as @font-face já carregadas) para a janelinha.
       document.querySelectorAll('style').forEach(s => { if (s.textContent?.includes('@font-face')) d.head.appendChild(s.cloneNode(true)); });
       const css = d.createElement('style');
-      css.textContent = `html,body{margin:0;height:100%}body{display:flex;flex-direction:column;align-items:center;justify-content:center;background:${BG};color:${FG};font-family:Oswald_600SemiBold,Oswald,"Arial Narrow",sans-serif;text-align:center;user-select:none}#t{font-size:34vw;line-height:1;font-variant-numeric:tabular-nums}#l{font-family:Inter_700Bold,Inter,sans-serif;font-size:8.5vw;text-transform:uppercase;letter-spacing:.06em;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}`;
+      css.textContent = `html,body{margin:0;height:100%}body{display:flex;flex-direction:column;align-items:center;justify-content:center;background:${BG};color:${FG};font-family:Oswald_600SemiBold,Oswald,"Arial Narrow",sans-serif;text-align:center;user-select:none}#t{font-size:34vw;line-height:1;font-variant-numeric:tabular-nums}#l{font-family:BarlowCondensed_700Bold,"Arial Narrow",sans-serif;font-size:10vw;text-transform:uppercase;letter-spacing:.06em;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}`;
       d.head.appendChild(css);
       d.body.innerHTML = '<div id="t"></div><div id="l"></div>';
       win.addEventListener('pagehide', () => { pip = null; emit(); });
