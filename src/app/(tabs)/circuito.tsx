@@ -9,7 +9,7 @@ import { newRun, setPendingRun } from '@/lib/runner';
 import { Sound } from '@/lib/sound';
 import { buildSequence, CIRCUITO_PRESETS, fmtClock, totalSeconds, type CircuitoConfig, type Station } from '@/lib/sequence';
 import { useStore } from '@/lib/store';
-import { beltLook, F, textSize, useC } from '@/lib/theme';
+import { beltLook, F, useC } from '@/lib/theme';
 
 type StationEdit = { index: number; st: Station };
 
@@ -169,7 +169,7 @@ export default function Circuito() {
             <Label size={13}>{drill ? 'Técnica' : 'Exercício'}</Label>
             <TextInput value={station.st.name} onChangeText={name => setStation({ ...station, st: { ...station.st, name } })} maxLength={40}
               placeholder={drill ? 'Ex.: Armlock da guarda' : 'Ex.: Sprawl, burpee'} placeholderTextColor={C.muted}
-              style={{ fontFamily: F.med, fontSize: textSize(20), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
+              style={{ fontFamily: F.med, fontSize: 20, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
           </View>
           <Stepper label="Duração" color={C.work} value={fmtClock(station.st.dur)}
             onMinus={() => setStation({ ...station, st: { ...station.st, dur: Math.max(10, station.st.dur - 5) } })}

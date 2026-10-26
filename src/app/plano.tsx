@@ -14,7 +14,7 @@ import {
 } from '@/lib/plano';
 import { fmtClock } from '@/lib/sequence';
 import { useStore } from '@/lib/store';
-import { beltLook, F, textSize, useC, type Palette } from '@/lib/theme';
+import { beltLook, F, useC, type Palette } from '@/lib/theme';
 
 type BlockEdit = { index: number; block: Block };
 type DayEdit = { weekday: number | null; time: number; weekly: boolean };
@@ -22,7 +22,7 @@ type DayEdit = { weekday: number | null; time: number; weekly: boolean };
 const KINDS: BlockKind[] = ['aquecimento', 'drills', 'posicao', 'combates', 'calma'];
 const DAYS: [number | null, string][] = [[1, 'Seg'], [2, 'Ter'], [3, 'Qua'], [4, 'Qui'], [5, 'Sex'], [6, 'Sáb'], [0, 'Dom'], [null, 'Sem dia']];
 
-const input = (C: Palette, size = 20) => ({ fontFamily: F.med, fontSize: textSize(size), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 });
+const input = (C: Palette, size = 20) => ({ fontFamily: F.med, fontSize: size, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 });
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
 // Editar um plano de treino: dia, blocos, observações. Voltar também guarda o que mudou.

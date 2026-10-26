@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-// Direção visual "Tatame": fundo de tecido de kimono, tipografia condensada e a faixa como destaque.
+// Direção visual "Tatame": fundo liso escuro, tipografia condensada e a faixa como destaque.
 
 export const DARK = {
   dark: true,
@@ -20,12 +20,11 @@ export const DARK = {
   bar: 'rgba(17,19,21,.96)',
   stitch: 'rgba(255,255,255,.10)',
   ring: 'rgba(243,241,234,.25)',
-  fabric: 'escuro' as TextureKey,
 };
 
 export type Palette = typeof DARK;
 
-// Versão clara: tecido claro, texto grafite e as cores das fases mais escuras para ler bem no fundo claro.
+// Versão clara: fundo claro, texto grafite e as cores das fases mais escuras para ler bem no fundo claro.
 export const LIGHT: Palette = {
   dark: false,
   ground: '#eeebe3',
@@ -44,36 +43,30 @@ export const LIGHT: Palette = {
   bar: 'rgba(246,244,238,.94)',
   stitch: 'rgba(0,0,0,.14)',
   ring: 'rgba(23,24,26,.25)',
-  fabric: 'claro',
 };
 
 export const ThemeCtx = createContext<Palette>(DARK);
 export const useC = () => useContext(ThemeCtx);
 
-// Inter nos textos, Anton nos títulos e nomes, Oswald nos números.
+// Barlow Condensed nos textos, Anton nos títulos e nomes, Oswald nos números.
 export const F = {
-  reg: 'Inter_400Regular',
-  med: 'Inter_500Medium',
-  semi: 'Inter_600SemiBold',
-  bold: 'Inter_700Bold',
+  reg: 'BarlowCondensed_400Regular',
+  med: 'BarlowCondensed_500Medium',
+  semi: 'BarlowCondensed_600SemiBold',
+  bold: 'BarlowCondensed_700Bold',
   title: 'Anton_400Regular',
   num: 'Oswald_600SemiBold',
   numMed: 'Oswald_500Medium',
 };
 
-// Os tamanhos do app foram pensados para a Barlow Condensed, mais estreita. A Inter ocupa mais largura,
-// então o texto sai um pouco menor e as etiquetas em maiúsculas ficam com pouco espaçamento.
-export const textSize = (n: number) => Math.round(n * 0.88 * 2) / 2;
+// Fundo liso da tela do treino: um escuro puxado para a cor da fase.
+export type ToneKey = 'verde' | 'vermelho' | 'amarelo' | 'azul';
 
-export type TextureKey = 'escuro' | 'verde' | 'vermelho' | 'amarelo' | 'azul' | 'claro';
-
-export const TEXTURES: Record<TextureKey, number> = {
-  escuro: require('@/assets/textures/tecido-escuro.jpg'),
-  verde: require('@/assets/textures/tecido-verde.jpg'),
-  vermelho: require('@/assets/textures/tecido-vermelho.jpg'),
-  amarelo: require('@/assets/textures/tecido-amarelo.jpg'),
-  azul: require('@/assets/textures/tecido-azul.jpg'),
-  claro: require('@/assets/textures/tecido-claro.jpg'),
+export const TONES: Record<ToneKey, string> = {
+  verde: '#1a2914',
+  vermelho: '#2e1614',
+  amarelo: '#2b2610',
+  azul: '#141f30',
 };
 
 export type BeltKey = 'branca' | 'cinza' | 'amarela' | 'laranja' | 'verde' | 'azul' | 'roxa' | 'marrom' | 'preta';
