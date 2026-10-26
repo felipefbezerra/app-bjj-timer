@@ -1,5 +1,5 @@
 import type { SoundMode } from './store';
-import { audioContext } from './webaudio';
+import { audioContext, audioSession, isIOS } from './webaudio';
 
 // Versão web (PWA): bipes pelo Web Audio e voz pelo leitor do próprio aparelho.
 // Diferente de um <audio>, o Web Audio não toma o foco de áudio do celular:
@@ -38,14 +38,23 @@ function pickVoice() {
 }
 if (tts) { pickVoice(); tts.addEventListener?.('voiceschanged', pickVoice); }
 
+let silentPlay = false;
+
 export const Sound = {
+  // Só no iPhone a chave do silencioso cala o app web; o app instalado da loja já toca nela.
+  hasSilentSwitch: isIOS,
+  setSilentPlay(on: boolean) { silentPlay = on; audioSession(on ? 'playback' : 'ambient'); },
   // Chamado no toque de "Começar": o navegador só libera som e voz a partir de um toque.
   prime() {
     audioContext();
     try { if (tts) { tts.cancel(); tts.speak(new SpeechSynthesisUtterance('')); } } catch {}
   },
   async start() { audioContext(); },
-  stop() { try { tts?.cancel(); } catch {} },
+  stop() {
+    try { tts?.cancel(); } catch {}
+    // Fora do treino, volta a misturar com a música de outros apps.
+    if (silentPlay) audioSession('ambient');
+  },
   cue(c: Cue, mode: SoundMode) {
     if (mode === 'mute') return;
     CUES[c]();

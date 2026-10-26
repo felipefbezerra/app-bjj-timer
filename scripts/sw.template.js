@@ -12,18 +12,15 @@ self.addEventListener('activate', e => {
     .then(() => self.clients.claim()));
 });
 
-// Páginas: rede primeiro, para cada atualização aparecer na hora; sem internet, usa a cópia guardada.
+// Páginas: abre na hora com a cópia guardada desta versão, sem esperar a internet (sinal fraco no tatame).
+// A versão nova chega pelo próprio sw.js: ela se instala ao fundo e a página recarrega uma vez (fora do treino).
 // Scripts, imagens, sons e fontes: guardados (os nomes mudam a cada versão).
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
   if (e.request.mode === 'navigate') {
-    e.respondWith(fetch(e.request, { cache: 'no-store' }).then(res => {
-      const copy = res.clone();
-      caches.open(CACHE).then(c => c.put('/', copy));
-      return res;
-    }).catch(() => caches.match('/')));
+    e.respondWith(caches.match('/', { cacheName: CACHE }).then(hit => hit || fetch(e.request)));
     return;
   }
   e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {

@@ -5,6 +5,7 @@ import { Belt } from '@/components/belt';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
 import { Label, Panel, PrimaryButton, Screen, Split, Txt, useWide } from '@/components/ui';
 import { blockColor } from '@/lib/plano';
+import { Sound } from '@/lib/sound';
 import { useStore, type Profile, type Session, type SoundMode, type ThemeMode } from '@/lib/store';
 import { BELT_ORDER, BELTS, beltLook, F, useC } from '@/lib/theme';
 
@@ -230,7 +231,21 @@ export default function Treinos() {
             </Pressable>
           ))}
         </View>
-        <Txt f="reg" size={14} color={C.muted}>A voz e os bipes tocam por cima da música de outros apps, como Spotify e YouTube, sem pausá-la.</Txt>
+        {!(Sound.hasSilentSwitch && st.silentPlay) && <Txt f="reg" size={14} color={C.muted}>A voz e os bipes tocam por cima da música de outros apps, como Spotify e YouTube, sem pausá-la.</Txt>}
+        {Sound.hasSilentSwitch && <>
+          <Label size={13}>iPhone no silencioso</Label>
+          <View style={{ flexDirection: 'row', gap: 6, backgroundColor: C.ground, borderRadius: 12, padding: 4 }}>
+            {([[false, 'Ficar mudo'], [true, 'Tocar']] as [boolean, string][]).map(([k, t]) => (
+              <Pressable key={t} accessibilityRole="button" accessibilityState={{ selected: st.silentPlay === k }} onPress={() => st.set({ silentPlay: k })}
+                style={{ flex: 1, paddingVertical: 10, borderRadius: 9, alignItems: 'center', backgroundColor: st.silentPlay === k ? C.line2 : 'transparent' }}>
+                <Txt f="semi" size={16} color={st.silentPlay === k ? C.fg : C.muted} caps>{t}</Txt>
+              </Pressable>
+            ))}
+          </View>
+          <Txt f="reg" size={14} color={C.muted}>{st.silentPlay
+            ? 'Os bipes e a voz tocam mesmo com a chave no silencioso, mas a música de outros apps, como o Spotify, pausa durante o treino.'
+            : 'Com a chave no silencioso o treino fica sem som. Escolha Tocar para ouvir mesmo assim (a música de outros apps pausa durante o treino).'}</Txt>
+        </>}
         <Label size={13}>Tema</Label>
         <View style={{ flexDirection: 'row', gap: 6, backgroundColor: C.ground, borderRadius: 12, padding: 4 }}>
           {([['auto', 'Automático'], ['light', 'Claro'], ['dark', 'Escuro']] as [ThemeMode, string][]).map(([k, t]) => (

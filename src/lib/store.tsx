@@ -17,6 +17,10 @@ export type PresetId = 'aula' | 'competicao' | 'rola' | 'posicao' | 'custom';
 type Data = {
   profile: Profile;
   sound: SoundMode;
+  // iPhone, versão web: tocar mesmo com a chave no silencioso (pausa a música de outros apps).
+  silentPlay: boolean;
+  // Já mostrou o aviso "Sem som? Confira o silencioso".
+  silentTip: boolean;
   theme: ThemeMode;
   weeklyGoal: number;
   preset: PresetId;
@@ -36,6 +40,8 @@ export const DEFAULT_CUSTOM: CombateConfig = { prep: 10, work: 300, rest: 60, ro
 const DEFAULTS: Data = {
   profile: { name: '', belt: 'branca', degrees: 0 },
   sound: 'voice',
+  silentPlay: false,
+  silentTip: false,
   theme: 'auto',
   weeklyGoal: 4,
   preset: 'aula',

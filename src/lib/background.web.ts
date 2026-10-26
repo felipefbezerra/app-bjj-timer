@@ -3,14 +3,12 @@ import { audioContext } from './webaudio';
 
 // Versão web (PWA): um tom grave e baixíssimo, que ninguém escuta, faz o navegador tratar o treino
 // como áudio tocando, então o relógio, os bipes e a voz seguem com o app em segundo plano.
-// No iPhone (Safari 16.4+), o modo "ambient" mistura o som com a música de outros apps.
+// O modo de áudio do iPhone (com ou sem som no silencioso) é escolhido em Sound.setSilentPlay.
 
 let hum: OscillatorNode | null = null;
 
 export const Background = {
   async start(_info: BgInfo) {
-    const nav = navigator as Navigator & { audioSession?: { type: string } };
-    if (nav.audioSession) { try { nav.audioSession.type = 'ambient'; } catch {} }
     const a = audioContext();
     if (!a || hum) return;
     try {
