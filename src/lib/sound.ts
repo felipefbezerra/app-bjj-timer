@@ -30,6 +30,9 @@ async function ensure() {
 }
 
 export const Sound = {
+  // No app instalado o som já toca com a chave do silencioso e junto com a música (playsInSilentMode + mixWithOthers).
+  hasSilentSwitch: false,
+  setSilentPlay(_on: boolean) {},
   prime() {},
   async start() {
     await ensure();

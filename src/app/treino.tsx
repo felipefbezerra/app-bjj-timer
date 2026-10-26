@@ -28,6 +28,16 @@ const LOOK: Record<PhaseType, { color: string; tone: ToneKey; soft: string }> = 
 
 const lookOf = (s: Phase) => LOOK[s.look ?? s.type];
 
+// Tela acesa durante o treino. No navegador (iPhone e Android) a trava cai quando o app sai da tela,
+// por isso é pedida de novo na volta. Soltar duas vezes daria erro, daí o controle.
+let awake = false;
+function stayAwake() { awake = true; activateKeepAwakeAsync().catch(() => {}); }
+function letSleep() {
+  if (!awake) return;
+  awake = false;
+  deactivateKeepAwake().catch(() => {});
+}
+
 // Contador embaixo do tempo: volta, estação ou, nos planos, o bloco e o item.
 function counterOf(r: Run, s: Phase, works: number) {
   if (r.mode === 'plano') return s.tag ?? r.label;
@@ -82,6 +92,16 @@ function Treino() {
   const savedRef = useRef(false);
   const soundRef = useRef(st.sound);
   useEffect(() => { soundRef.current = st.sound; }, [st.sound]);
+  const silentRef = useRef(st.silentPlay);
+  // iPhone, versão web: o site não sabe se a chave do silencioso está ligada, então avisa uma vez.
+  const [tip, setTip] = useState(() => Sound.hasSilentSwitch && !st.silentPlay && !st.silentTip && st.sound !== 'mute');
+  useEffect(() => {
+    if (!tip) return;
+    st.set({ silentTip: true });
+    const id = setTimeout(() => setTip(false), 9000);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const saveHistory = useCallback((r: Run) => {
     if (savedRef.current || r.work < 30) return false;
@@ -110,7 +130,7 @@ function Treino() {
         // O plano vai para os treinos pela tela de planejado x feito.
         if (r.mode !== 'plano') saveHistory(r);
         RunStore.save(null);
-        deactivateKeepAwake();
+        letSleep();
         Background.stop();
         Janela.setAuto(false);
         Janela.update({ time: 'Oss!', label: 'Treino concluído', color: C.fg });
@@ -122,7 +142,8 @@ function Treino() {
     const r = runRef.current;
     if (!r) { router.back(); return; }
     clearPendingRun(r);
-    activateKeepAwakeAsync().catch(() => {});
+    stayAwake();
+    Sound.setSilentPlay(silentRef.current);
     Sound.start().then(() => { if (r.i === 0 && !r.paused && r.seq[0].dur - r.remaining < 1) Sound.say(phaseSpeech(r), soundRef.current); });
     // Android: serviço com notificação para seguir contando e falando com outro app aberto,
     // e a janelinha flutuante quando você sai do app.
@@ -137,10 +158,10 @@ function Treino() {
       sync();
     }, 250);
     const sub = AppState.addEventListener('change', s => {
-      if (s === 'active') { handle(r, step(r)); sync(); }
+      if (s === 'active') { handle(r, step(r)); if (!r.finished) stayAwake(); sync(); }
       else RunStore.save(r);
     });
-    return () => { clearInterval(id); sub.remove(); deactivateKeepAwake(); Sound.stop(); Background.stop(); Janela.setAuto(false); Janela.close(); };
+    return () => { clearInterval(id); sub.remove(); letSleep(); Sound.stop(); Background.stop(); Janela.setAuto(false); Janela.close(); };
   }, [handle, sync]);
 
   const act = (fn: (cur: Run) => RunEvent[] | void) => {
@@ -158,7 +179,7 @@ function Treino() {
     if (cur && !cur.finished && cur.mode === 'plano' && cur.plan) {
       stopRun(cur);
       RunStore.save(null);
-      deactivateKeepAwake();
+      letSleep();
       Background.stop();
       Janela.setAuto(false);
       sync();
@@ -249,6 +270,14 @@ function Treino() {
 
   const pad = { paddingTop: insets.top + (landscape ? 8 : 12), paddingBottom: Math.max(landscape ? 12 : 24, insets.bottom + 8), paddingLeft: Math.max(20, insets.left + 12), paddingRight: Math.max(20, insets.right + 12) };
 
+  const tipBox = tip && (
+    <Pressable onPress={() => setTip(false)} accessibilityRole="button" accessibilityLabel="Fechar aviso"
+      style={{ marginTop: 12, padding: 14, borderRadius: 12, backgroundColor: 'rgba(17,19,21,.92)', borderWidth: 1, borderColor: 'rgba(243,241,234,.25)', gap: 4 }}>
+      <Txt f="semi" size={17}>Sem som?</Txt>
+      <Txt f="reg" size={15} color={C.muted}>Confira se o iPhone não está no silencioso. Para tocar mesmo assim, ative em Treinos › Ajustes.</Txt>
+    </Pressable>
+  );
+
   return (
     <Backdrop tone={look.tone}>
       <View style={{ height: 6, backgroundColor: look.color }} />
@@ -256,7 +285,7 @@ function Treino() {
         <View style={{ flex: 1, flexDirection: 'row', gap: 24, ...pad }}>
           <View style={{ flex: 1.15 }}>{clock}</View>
           <View style={{ flex: 1, justifyContent: 'space-between', gap: 14 }}>
-            {header}
+            <View>{header}{tipBox}</View>
             {progress}
             {controls}
           </View>
@@ -264,6 +293,7 @@ function Treino() {
       ) : (
         <View style={{ flex: 1, ...pad }}>
           {header}
+          {tipBox}
           {clock}
           {progress}
           {controls}
