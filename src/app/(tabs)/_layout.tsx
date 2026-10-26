@@ -21,7 +21,10 @@ function TabBar({ state, navigateToTab }: BottomTabBarProps) {
   // Celular deitado: barra baixa, com o ícone ao lado do nome, para sobrar altura para a tela.
   const short = useShort();
   // No computador, as abas ficam na mesma largura do conteúdo.
-  const side = Math.max(6, (useWindowDimensions().width - 1100) / 2);
+  const width = useWindowDimensions().width;
+  const side = Math.max(6, (width - 1100) / 2);
+  // Cinco abas num celular estreito: o nome diminui para "Cronômetro" não encostar nas vizinhas.
+  const label = width < 360 ? 12 : 13.5;
   return (
     <View style={{ flexDirection: 'row', paddingTop: short ? 6 : 10, paddingBottom: Math.max(short ? 6 : 14, insets.bottom), paddingLeft: side + insets.left, paddingRight: side + insets.right,
       borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.bar }}>
@@ -34,7 +37,7 @@ function TabBar({ state, navigateToTab }: BottomTabBarProps) {
           <Pressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={() => { if (!on) navigateToTab(route.key); }}
             style={{ flex: 1, flexDirection: short ? 'row' : 'column', alignItems: 'center', justifyContent: 'center', gap: short ? 8 : 4, minHeight: short ? 36 : undefined }}>
             <t.Icon color={color} />
-            <Txt f={on ? 'semi' : 'med'} size={12} color={color} caps track={0.06} numberOfLines={1}>{t.label}</Txt>
+            <Txt f={on ? 'semi' : 'med'} size={label} color={color} numberOfLines={1}>{t.label}</Txt>
           </Pressable>
         );
       })}

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
 import { POSITIONS } from '@/lib/sequence';
-import { F, useC } from '@/lib/theme';
+import { F, textSize, useC } from '@/lib/theme';
 import { Sheet } from './sheet';
 import { Label, Txt } from './ui';
 
@@ -88,7 +88,7 @@ export function PositionsSheet({ themes, order, custom, accent, ink, onClose, on
         <Label size={13}>Nova posição</Label>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TextInput value={text} onChangeText={setText} onSubmitEditing={add} maxLength={32} returnKeyType="done" placeholder="Ex.: Berimbolo" placeholderTextColor={C.muted}
-            style={{ flex: 1, minWidth: 0, fontFamily: F.med, fontSize: 18, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
+            style={{ flex: 1, minWidth: 0, fontFamily: F.med, fontSize: textSize(18), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
           <Pressable accessibilityRole="button" onPress={add} style={{ paddingHorizontal: 16, borderRadius: 12, backgroundColor: C.line, alignItems: 'center', justifyContent: 'center' }}>
             <Txt f="semi" size={16} caps track={0.06}>Adicionar</Txt>
           </Pressable>

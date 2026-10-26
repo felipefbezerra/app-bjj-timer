@@ -2,17 +2,22 @@ import type { ReactNode } from 'react';
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { F, TEXTURES, useC, type TextureKey } from '@/lib/theme';
+import { F, textSize, TEXTURES, useC, type TextureKey } from '@/lib/theme';
 
 type TxtProps = TextProps & { f?: keyof typeof F; size?: number; color?: string; caps?: boolean; track?: number; style?: StyleProp<TextStyle> };
 
 // Texto na tipografia do app. caps + track dão o visual de etiqueta (maiúsculas espaçadas).
+// "title" é a Anton dos títulos e nomes; num e numMed, a Oswald dos números; o resto é Inter.
 export function Txt({ f = 'med', size = 16, color, caps, track, style, ...rest }: TxtProps) {
   const C = useC();
+  const kind = f === 'title' ? 'title' : f === 'num' || f === 'numMed' ? 'num' : 'text';
+  const fs = kind === 'title' ? Math.round(size * 0.95) : kind === 'text' ? textSize(size) : size;
+  const tr = kind === 'title' ? 0.01 : kind === 'text' && track ? Math.min(track, 0.06) : track;
   return (
     <Text
       {...rest}
-      style={[{ fontFamily: F[f], fontSize: size, color: color ?? C.fg, letterSpacing: track ? size * track : undefined, textTransform: caps ? 'uppercase' : 'none' }, style]}
+      style={[{ fontFamily: F[f], fontSize: fs, color: color ?? C.fg, letterSpacing: tr ? fs * tr : undefined, textTransform: caps ? 'uppercase' : 'none',
+        lineHeight: kind === 'title' ? Math.round(fs * 1.3) : undefined }, style]}
     />
   );
 }
@@ -83,7 +88,7 @@ export function PrimaryButton({ label, onPress, icon, height = 64, light = true 
       onPress={onPress}
       style={({ pressed }) => [s.primary, { height, borderRadius: height / 2, backgroundColor: light ? C.fg : 'transparent', borderWidth: light ? 0 : 1, borderColor: C.line2, opacity: pressed ? 0.85 : 1 }]}>
       {icon}
-      <Txt f="bold" size={height > 56 ? 22 : 16} color={light ? C.ink : C.fg} caps track={height > 56 ? 0.12 : 0.08} numberOfLines={1} adjustsFontSizeToFit>{label}</Txt>
+      <Txt f="bold" size={height > 56 ? 20 : 15} color={light ? C.ink : C.fg} caps track={0.04} numberOfLines={1} adjustsFontSizeToFit style={{ flexShrink: 1 }}>{label}</Txt>
     </Pressable>
   );
 }

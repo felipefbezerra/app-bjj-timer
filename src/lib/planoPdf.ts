@@ -51,38 +51,38 @@ export function planHtml(p: Plan, link: string, from?: From, now = new Date()) {
   return `<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(p.name)}</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Oswald:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Anton&family=Oswald:wght@500;600&display=swap">
 <style>
 @page { size: A4; margin: 14mm 15mm; }
 * { box-sizing: border-box; }
-body { margin: 0; color: #17181a; font-family: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.k { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #5d6066; }
+body { margin: 0; color: #17181a; font-family: Inter, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.k { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #5d6066; }
 .num { font-family: Oswald, 'Arial Narrow', sans-serif; }
 .head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #17181a; padding-bottom: 10px; }
-h1 { margin: 2px 0 0; font-size: 36px; line-height: 1; text-transform: uppercase; }
-.meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0 12px; font-size: 14px; }
+h1 { margin: 4px 0 0; font-family: Anton, 'Arial Narrow', sans-serif; font-weight: 400; font-size: 34px; line-height: 1.15; letter-spacing: .01em; text-transform: uppercase; }
+.meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0 12px; font-size: 12.5px; }
 .meta b { display: block; font-weight: 600; text-transform: uppercase; }
 .belt { display: inline-block; position: relative; width: 40px; height: 8px; border-radius: 2px; vertical-align: middle; margin-left: 6px; border: 1px solid rgba(0,0,0,.2); }
 .belt span { position: absolute; right: 5px; top: 0; bottom: 0; width: 13px; }
 .bar { display: flex; gap: 3px; height: 10px; border-radius: 5px; overflow: hidden; }
-.stats { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 14px; font-size: 13px; color: #3d4045; text-transform: uppercase; letter-spacing: .08em; }
+.stats { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 14px; font-size: 11.5px; color: #3d4045; text-transform: uppercase; letter-spacing: .04em; }
 .stats b { font-family: Oswald, sans-serif; font-weight: 500; font-size: 15px; color: #17181a; }
 table { width: 100%; border-collapse: collapse; }
-th { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5d6066; text-align: left; font-weight: 500; padding: 0 8px 6px; }
+th { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #5d6066; text-align: left; font-weight: 500; padding: 0 8px 6px; }
 td { border-top: 1px solid #d9d6ce; padding: 9px 8px; vertical-align: top; }
 tr { page-break-inside: avoid; }
 td.n { width: 30px; padding-left: 0; } td.n span { display: inline-flex; width: 22px; height: 22px; border-radius: 11px; color: #fff; font-family: Oswald, sans-serif; font-size: 12px; align-items: center; justify-content: center; }
-td.b { width: 130px; font-weight: 700; text-transform: uppercase; font-size: 15px; }
-td.d { font-size: 13.5px; line-height: 1.35; color: #2a2c30; } .soft { color: #6b6e74; }
+td.b { width: 130px; font-family: Anton, 'Arial Narrow', sans-serif; font-weight: 400; letter-spacing: .01em; text-transform: uppercase; font-size: 15px; }
+td.d { font-size: 12px; line-height: 1.35; color: #2a2c30; } .soft { color: #6b6e74; }
 td.t { width: 56px; text-align: right; font-family: Oswald, sans-serif; font-size: 15px; }
 td.f { width: 26px; padding-right: 0; } td.f i { display: inline-block; width: 16px; height: 16px; border: 1.5px solid #6b6e74; border-radius: 3px; }
-.notes { margin-top: 14px; padding: 10px 12px; border-radius: 8px; background: #f2f0ea; font-size: 14px; line-height: 1.35; white-space: pre-wrap; }
+.notes { margin-top: 14px; padding: 10px 12px; border-radius: 8px; background: #f2f0ea; font-size: 12.5px; line-height: 1.35; white-space: pre-wrap; }
 .qr { display: flex; align-items: center; gap: 16px; margin-top: 18px; border-top: 1px solid #d9d6ce; padding-top: 14px; page-break-inside: avoid; }
-.qr b { display: block; font-size: 17px; text-transform: uppercase; margin-bottom: 4px; }
-.qr p { margin: 0; font-size: 13.5px; color: #3d4045; line-height: 1.35; }
+.qr b { display: block; font-family: Anton, 'Arial Narrow', sans-serif; font-weight: 400; letter-spacing: .01em; font-size: 17px; text-transform: uppercase; margin-bottom: 4px; }
+.qr p { margin: 0; font-size: 12px; color: #3d4045; line-height: 1.35; }
 .qr a { color: #2f6fd6; font-size: 11px; word-break: break-all; }
 @media screen { body { max-width: 760px; margin: 0 auto; padding: 32px 24px; } }
-.foot { margin-top: 12px; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #8a8d92; }
+.foot { margin-top: 12px; display: flex; justify-content: space-between; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8a8d92; }
 </style></head>
 <body>
   <div class="head">

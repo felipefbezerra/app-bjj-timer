@@ -50,7 +50,7 @@ export default function Cronometro() {
   const header = (
     <View style={{ paddingHorizontal: 20, paddingTop: 18, gap: 2 }}>
       <Label size={15}>Rola livre ou drill</Label>
-      <Txt f="bold" size={30} caps track={0.02}>Cronômetro</Txt>
+      <Txt f="title" size={30} caps>Cronômetro</Txt>
     </View>
   );
   const ring = <Ring size={side ? Math.max(180, Math.min(290, height - 120)) : 290} frac={minuteFrac} color={accent} main={t.main} dec={t.dec}

@@ -8,7 +8,7 @@ import { blockChip, blockColor, blockDetail, blockSeconds, BLOCK_NAME, hmParts, 
 import { planHtml } from '@/lib/planoPdf';
 import { useStore } from '@/lib/store';
 import { fmtClock } from '@/lib/sequence';
-import { beltLook, BELTS, F, useC } from '@/lib/theme';
+import { beltLook, BELTS, F, textSize, useC } from '@/lib/theme';
 import { Belt } from './belt';
 import { PlanBar } from './plano';
 import { Sheet } from './sheet';
@@ -72,7 +72,7 @@ export function ShareSheet({ plan, onClose }: { plan: Plan; onClose: () => void 
       <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>{icon}</View>
       <View style={{ flex: 1, gap: 3 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <Txt f="bold" size={20} caps>{title}</Txt>
+          <Txt f="title" size={20} caps>{title}</Txt>
           {tag && <View style={{ paddingVertical: 1, paddingHorizontal: 8, borderRadius: 999, backgroundColor: C.dark ? 'rgba(143,224,74,.16)' : 'rgba(47,122,14,.12)' }}><Txt f="semi" size={12} color={C.work} caps track={0.1}>{tag}</Txt></View>}
         </View>
         <Txt f="med" size={15} color={C.soft}>{line}</Txt>
@@ -86,7 +86,7 @@ export function ShareSheet({ plan, onClose }: { plan: Plan; onClose: () => void 
       <Txt f="med" size={16} color={C.soft}>Para outro professor dar a aula no seu lugar.</Txt>
       <View style={{ gap: 8, padding: 12, paddingHorizontal: 14, borderRadius: 14, backgroundColor: C.ground }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
-          <Txt f="bold" size={20} caps numberOfLines={1} style={{ flex: 1 }}>{plan.name}</Txt>
+          <Txt f="title" size={20} caps numberOfLines={1} style={{ flex: 1 }}>{plan.name}</Txt>
           <Txt f="numMed" size={20}>{`${n} ${unit}`}</Txt>
         </View>
         <PlanBar plan={plan} height={8} />
@@ -129,7 +129,7 @@ export function PlanPreview({ plan }: { plan: Plan }) {
     <Panel stitch style={{ borderRadius: 16, gap: 10 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
         <View style={{ flex: 1, gap: 2 }}>
-          <Txt f="bold" size={26} caps style={{ lineHeight: 28 }}>{plan.name}</Txt>
+          <Txt f="title" size={26} caps>{plan.name}</Txt>
           <Txt f="med" size={14} color={C.muted} caps track={0.1}>{`${whenLabel(plan)}${plan.weekday !== null && plan.weekly ? ` · ${repeatLabel(plan).toLowerCase()}` : ''}`}</Txt>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3 }}>
@@ -198,7 +198,7 @@ export function ImportSheet({ onClose, onImported }: { onClose: () => void; onIm
         <Label size={13}>Link do plano</Label>
         <TextInput value={text} onChangeText={t => { setText(t); setErr(''); }} placeholder="Cole aqui o link ou a mensagem" placeholderTextColor={C.muted}
           autoCapitalize="none" autoCorrect={false} multiline numberOfLines={2} accessibilityLabel="Link do plano"
-          style={{ fontFamily: F.med, fontSize: 16, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: sh ? b.accent : C.line, paddingHorizontal: 12, paddingVertical: 10, maxHeight: 84 }} />
+          style={{ fontFamily: F.med, fontSize: textSize(16), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: sh ? b.accent : C.line, paddingHorizontal: 12, paddingVertical: 10, maxHeight: 84 }} />
       </View>
       {sh && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, paddingHorizontal: 14, borderRadius: 14, backgroundColor: C.dark ? '#24282c' : 'rgba(255,255,255,.9)' }}>

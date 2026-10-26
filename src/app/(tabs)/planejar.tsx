@@ -30,7 +30,7 @@ export default function Planejar() {
   const header = (
     <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, gap: 2 }}>
       <Label size={15}>Monte a aula</Label>
-      <Txt f="bold" size={30} caps track={0.02}>Planejamento</Txt>
+      <Txt f="title" size={30} caps>Planejamento</Txt>
     </View>
   );
 
@@ -42,7 +42,7 @@ export default function Planejar() {
         <Panel stitch style={{ borderRadius: 18, padding: 18, gap: 14 }}>
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
             <View style={{ flex: 1, gap: 2 }}>
-              <Txt f="bold" size={30} caps style={{ lineHeight: 32 }} numberOfLines={2}>{next.name || 'Plano sem nome'}</Txt>
+              <Txt f="title" size={30} caps numberOfLines={2}>{next.name || 'Plano sem nome'}</Txt>
               <Txt f="med" size={16} color={C.muted} caps track={0.1}>{whenLabel(next, now)}</Txt>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
@@ -62,7 +62,7 @@ export default function Planejar() {
   })() : (
     <View style={{ paddingHorizontal: 20 }}>
       <Panel stitch style={{ borderRadius: 18, padding: 18, gap: 10 }}>
-        <Txt f="bold" size={26} caps>Nenhum plano ainda</Txt>
+        <Txt f="title" size={26} caps>Nenhum plano ainda</Txt>
         <Txt f="reg" size={17} color={C.soft}>Monte a aula em blocos: aquecimento, drills, posição específica, combates e volta à calma. O app calcula o tempo total e roda tudo em sequência, falando cada drill e posição. Recebeu um plano? Toque em “Importar”.</Txt>
       </Panel>
     </View>
@@ -79,7 +79,7 @@ export default function Planejar() {
           <Pressable key={p.id} accessibilityRole="button" accessibilityHint="Editar plano" onPress={() => edit(p.id)}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 16, borderRadius: 14, backgroundColor: C.panel }}>
             <View style={{ flex: 1, gap: 2 }}>
-              <Txt f="semi" size={22} caps numberOfLines={1}>{p.name || 'Plano sem nome'}</Txt>
+              <Txt f="title" size={22} caps numberOfLines={1}>{p.name || 'Plano sem nome'}</Txt>
               <Txt f="med" size={15} color={C.muted} numberOfLines={1}>{planLine(p)}</Txt>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3 }}>
