@@ -50,14 +50,20 @@ export const LIGHT: Palette = {
 export const ThemeCtx = createContext<Palette>(DARK);
 export const useC = () => useContext(ThemeCtx);
 
+// Inter nos textos, Anton nos títulos e nomes, Oswald nos números.
 export const F = {
-  reg: 'BarlowCondensed_400Regular',
-  med: 'BarlowCondensed_500Medium',
-  semi: 'BarlowCondensed_600SemiBold',
-  bold: 'BarlowCondensed_700Bold',
+  reg: 'Inter_400Regular',
+  med: 'Inter_500Medium',
+  semi: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+  title: 'Anton_400Regular',
   num: 'Oswald_600SemiBold',
   numMed: 'Oswald_500Medium',
 };
+
+// Os tamanhos do app foram pensados para a Barlow Condensed, mais estreita. A Inter ocupa mais largura,
+// então o texto sai um pouco menor e as etiquetas em maiúsculas ficam com pouco espaçamento.
+export const textSize = (n: number) => Math.round(n * 0.88 * 2) / 2;
 
 export type TextureKey = 'escuro' | 'verde' | 'vermelho' | 'amarelo' | 'azul' | 'claro';
 

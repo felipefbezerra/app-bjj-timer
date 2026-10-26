@@ -44,7 +44,7 @@ export default function Combate() {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10 }}>
           <View style={{ gap: 2 }}>
             <Label size={15}>{greeting}</Label>
-            <Txt f="bold" size={30} caps track={0.02}>Combate</Txt>
+            <Txt f="title" size={30} caps>Combate</Txt>
           </View>
           <Pressable onPress={() => router.navigate('/treinos')} accessibilityLabel="Ver perfil" style={{ alignItems: 'flex-end', gap: 6 }}>
             <Belt belt={st.profile.belt} degrees={st.profile.degrees} height={14} width={88} small />

@@ -17,7 +17,7 @@ export function Sheet({ open, title, onClose, children, actions }: { open: boole
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Fechar" />
         <View style={{ backgroundColor: C.dark ? C.panel : '#f6f4ee', borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 20, paddingTop: short ? 14 : 20,
           paddingBottom: Math.max(short ? 12 : 20, insets.bottom + 8), maxHeight: short ? '94%' : '88%', gap: short ? 10 : 16, width: '100%', maxWidth: 600, alignSelf: 'center' }}>
-          <Txt f="bold" size={short ? 20 : 24} caps track={0.02}>{title}</Txt>
+          <Txt f="title" size={short ? 20 : 24} caps>{title}</Txt>
           <ScrollView contentContainerStyle={{ gap: 14 }} keyboardShouldPersistTaps="handled">{children}</ScrollView>
           {actions}
         </View>

@@ -6,7 +6,7 @@ import { Sheet, SheetActions, Stepper } from '@/components/sheet';
 import { Label, Panel, PrimaryButton, Screen, Split, Txt, useWide } from '@/components/ui';
 import { blockColor } from '@/lib/plano';
 import { useStore, type Profile, type Session, type SoundMode, type ThemeMode } from '@/lib/store';
-import { BELT_ORDER, BELTS, beltLook, F, useC } from '@/lib/theme';
+import { BELT_ORDER, BELTS, beltLook, F, textSize, useC } from '@/lib/theme';
 
 const MONTHS = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const WD = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -87,7 +87,7 @@ export default function Treinos() {
           <Panel stitch style={{ gap: 14, borderRadius: 18 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <View style={{ gap: 2, flex: 1 }}>
-                <Txt f="bold" size={32} caps numberOfLines={1}>{st.profile.name || 'Seu nome'}</Txt>
+                <Txt f="title" size={32} caps numberOfLines={1}>{st.profile.name || 'Seu nome'}</Txt>
                 <Label size={15}>Faixa {b.name.toLowerCase()} · {st.profile.degrees ? `${st.profile.degrees} ${st.profile.degrees === 1 ? 'grau' : 'graus'}` : 'lisa'}</Label>
               </View>
               <Pressable accessibilityRole="button" onPress={() => setProfile({ ...st.profile, goal: st.weeklyGoal })}
@@ -100,7 +100,7 @@ export default function Treinos() {
 
           <Panel style={{ gap: 14, borderRadius: 18 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <Txt f="bold" size={22} caps>Esta semana</Txt>
+              <Txt f="title" size={22} caps>Esta semana</Txt>
               <Label>{new Date(ws).getDate()} a {new Date(ws + 6 * DAY).getDate()} {MONTHS[new Date(ws + 6 * DAY).getMonth()].slice(0, 3).toLowerCase()}</Label>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
@@ -139,7 +139,7 @@ export default function Treinos() {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: wide ? 0 : 4 }}>
             <Pressable accessibilityLabel="Mês anterior" onPress={() => setView(v => v.m ? { y: v.y, m: v.m - 1 } : { y: v.y - 1, m: 11 })}
               style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.panel, alignItems: 'center', justifyContent: 'center' }}><Txt size={22}>‹</Txt></Pressable>
-            <Txt f="bold" size={22} caps>{MONTHS[view.m]} {view.y}</Txt>
+            <Txt f="title" size={22} caps>{MONTHS[view.m]} {view.y}</Txt>
             <Pressable accessibilityLabel="Próximo mês" disabled={isThisMonth} onPress={() => setView(v => v.m < 11 ? { y: v.y, m: v.m + 1 } : { y: v.y + 1, m: 0 })}
               style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.panel, alignItems: 'center', justifyContent: 'center', opacity: isThisMonth ? 0.35 : 1 }}><Txt size={22}>›</Txt></Pressable>
           </View>
@@ -169,7 +169,7 @@ export default function Treinos() {
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.line }}>
                   <View style={{ width: 6, height: 38, borderRadius: 3, backgroundColor: h.manual ? C.relax : h.mode === 'plano' ? blockColor('posicao', C.dark) : h.mode === 'circuito' ? C.cycle : C.work }} />
                   <View style={{ flex: 1 }}>
-                    <Txt f="semi" size={20} caps numberOfLines={1}>{title(h)}</Txt>
+                    <Txt f="title" size={20} caps numberOfLines={1}>{title(h)}</Txt>
                     <Txt f="med" size={14} color={C.muted} caps numberOfLines={1}>{when}{h.manual ? ' · registrado' : ''}{h.themes.length ? ` · ${h.themes.join(', ')}` : ''}</Txt>
                   </View>
                   <Txt f="numMed" size={20}>{hm(h.work)}</Txt>
@@ -197,7 +197,7 @@ export default function Treinos() {
           <View style={{ gap: 6 }}>
             <Label size={13}>Nome ou apelido</Label>
             <TextInput value={profile.name} onChangeText={name => setProfile({ ...profile, name })} maxLength={24} placeholder="Como quer ser chamado" placeholderTextColor={C.muted}
-              style={{ fontFamily: F.med, fontSize: 20, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
+              style={{ fontFamily: F.med, fontSize: textSize(20), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
           </View>
           <Label size={13}>Faixa</Label>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>

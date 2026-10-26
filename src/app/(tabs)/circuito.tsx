@@ -9,7 +9,7 @@ import { newRun, setPendingRun } from '@/lib/runner';
 import { Sound } from '@/lib/sound';
 import { buildSequence, CIRCUITO_PRESETS, fmtClock, totalSeconds, type CircuitoConfig, type Station } from '@/lib/sequence';
 import { useStore } from '@/lib/store';
-import { beltLook, F, useC } from '@/lib/theme';
+import { beltLook, F, textSize, useC } from '@/lib/theme';
 
 type StationEdit = { index: number; st: Station };
 
@@ -80,7 +80,7 @@ export default function Circuito() {
             <Pressable key={p.id} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => store.set({ circuitoPreset: p.id })}
               style={{ width: '48.5%', minHeight: 112, borderRadius: 16, padding: 14, paddingHorizontal: 16, gap: 6, backgroundColor: on ? b.accent : C.panel }}>
               <View pointerEvents="none" style={{ position: 'absolute', top: 7, left: 7, right: 7, bottom: 7, borderRadius: 11, borderWidth: 1, borderStyle: 'dashed', borderColor: on ? 'rgba(0,0,0,.18)' : C.stitch }} />
-              <Txt f="semi" size={13} color={on ? b.ink : C.muted} caps track={0.12}>{p.kicker}</Txt>
+              <Txt f="semi" size={13} color={on ? b.ink : C.muted} caps track={0.12} numberOfLines={1} adjustsFontSizeToFit>{p.kicker}</Txt>
               <Txt f="num" size={32} color={on ? b.ink : C.fg} style={{ lineHeight: 38 }}>{p.big}</Txt>
               <Txt f="med" size={15} color={on ? b.ink : C.soft} style={{ marginTop: 'auto' }}>{p.line}</Txt>
             </Pressable>
@@ -103,7 +103,7 @@ export default function Circuito() {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10 }}>
           <View style={{ gap: 2 }}>
             <Label size={15}>Condicionamento e técnica</Label>
-            <Txt f="bold" size={30} caps track={0.02}>Circuito</Txt>
+            <Txt f="title" size={30} caps>Circuito</Txt>
           </View>
           <Txt f="numMed" size={22}>{fmtClock(totalSeconds(buildSequence('circuito', c)))}</Txt>
         </View>
@@ -133,7 +133,7 @@ export default function Circuito() {
               <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: b.accent, alignItems: 'center', justifyContent: 'center' }}>
                 <Txt f="num" size={17} color={b.ink}>{String(i + 1)}</Txt>
               </View>
-              <Txt f="semi" size={22} caps style={{ flex: 1 }} numberOfLines={1}>{x.name}</Txt>
+              <Txt f="title" size={22} caps style={{ flex: 1 }} numberOfLines={1}>{x.name}</Txt>
               <Txt f="numMed" size={18} color={C.muted}>{fmtClock(x.dur)}</Txt>
               <IconHandle />
             </Pressable>
@@ -169,7 +169,7 @@ export default function Circuito() {
             <Label size={13}>{drill ? 'Técnica' : 'Exercício'}</Label>
             <TextInput value={station.st.name} onChangeText={name => setStation({ ...station, st: { ...station.st, name } })} maxLength={40}
               placeholder={drill ? 'Ex.: Armlock da guarda' : 'Ex.: Sprawl, burpee'} placeholderTextColor={C.muted}
-              style={{ fontFamily: F.med, fontSize: 20, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
+              style={{ fontFamily: F.med, fontSize: textSize(20), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 }} />
           </View>
           <Stepper label="Duração" color={C.work} value={fmtClock(station.st.dur)}
             onMinus={() => setStation({ ...station, st: { ...station.st, dur: Math.max(10, station.st.dur - 5) } })}

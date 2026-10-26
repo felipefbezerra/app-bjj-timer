@@ -6,7 +6,7 @@ import { blockColor, blockSeconds, blockTarget, BLOCK_NAME, doneFromRun, doneLin
 import { type Run } from '@/lib/runner';
 import { fmtClock } from '@/lib/sequence';
 import { useStore } from '@/lib/store';
-import { DARK as C, F } from '@/lib/theme';
+import { DARK as C, F, textSize } from '@/lib/theme';
 import { IconCheck } from './icons';
 import { PlanBar } from './plano';
 import { Fabric, Label, Panel, PrimaryButton, Txt } from './ui';
@@ -52,7 +52,7 @@ export function Resumo({ run, onClose, landscape }: { run: Run; onClose: () => v
     <>
       <View style={{ gap: 4 }}>
         <Label size={15}>{`${WD[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]} · ${plan.name}`}</Label>
-        <Txt f="bold" size={landscape ? 36 : 44} caps style={{ lineHeight: landscape ? 38 : 46 }}>Planejado x feito</Txt>
+        <Txt f="title" size={landscape ? 36 : 44} caps>Planejado x feito</Txt>
       </View>
       <Panel stitch style={{ borderRadius: 18, padding: 20, gap: 14 }}>
         <View style={{ gap: 8 }}>
@@ -93,7 +93,7 @@ export function Resumo({ run, onClose, landscape }: { run: Run; onClose: () => v
                 {!full && !none && <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color }} />}
               </Pressable>
               <View style={{ flex: 1, gap: 1 }}>
-                <Txt f="semi" size={20} caps numberOfLines={1} color={none ? C.muted : C.fg}>{BLOCK_NAME[b.kind]}</Txt>
+                <Txt f="title" size={20} caps numberOfLines={2} color={none ? C.muted : C.fg}>{BLOCK_NAME[b.kind]}</Txt>
                 <Txt f="med" size={14} color={C.muted}>{`Planejado: ${planned(b)}`}</Txt>
               </View>
               {toggle ? (
@@ -115,7 +115,7 @@ export function Resumo({ run, onClose, landscape }: { run: Run; onClose: () => v
         <Label>Como foi</Label>
         <TextInput value={note} onChangeText={setNote} multiline maxLength={400} placeholder="Ex.: cansei no 5º combate, a passagem saiu bem" placeholderTextColor={C.muted}
           accessibilityLabel="Como foi o treino"
-          style={{ fontFamily: F.med, fontSize: 18, color: C.fg, backgroundColor: C.panel, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10, minHeight: 80, textAlignVertical: 'top' }} />
+          style={{ fontFamily: F.med, fontSize: textSize(18), color: C.fg, backgroundColor: C.panel, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10, minHeight: 80, textAlignVertical: 'top' }} />
       </View>
       <View style={{ gap: 10 }}>
         <PrimaryButton label="Salvar nos treinos" height={60} onPress={save} />

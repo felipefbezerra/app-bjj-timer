@@ -37,7 +37,7 @@ export default function Receber() {
         {header}
         <View style={{ padding: 20, gap: 16, width: '100%', maxWidth: 560, alignSelf: 'center' }}>
           <Panel stitch style={{ borderRadius: 18, gap: 8, padding: 18 }}>
-            <Txt f="bold" size={26} caps>Esse plano não abriu</Txt>
+            <Txt f="title" size={26} caps>Esse plano não abriu</Txt>
             <Txt f="reg" size={17} color={C.soft}>O link pode ter sido cortado na mensagem. Peça para mandarem de novo ou use o arquivo do plano em Planejar › Importar.</Txt>
           </Panel>
           <PrimaryButton label="Ir para Planejar" height={56} onPress={leave} />

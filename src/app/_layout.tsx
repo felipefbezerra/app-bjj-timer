@@ -1,4 +1,5 @@
-import { BarlowCondensed_400Regular, BarlowCondensed_500Medium, BarlowCondensed_600SemiBold, BarlowCondensed_700Bold } from '@expo-google-fonts/barlow-condensed';
+import { Anton_400Regular } from '@expo-google-fonts/anton';
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Oswald_500Medium, Oswald_600SemiBold } from '@expo-google-fonts/oswald';
 import { useFonts } from 'expo-font';
 import { router, Stack } from 'expo-router';
@@ -18,7 +19,7 @@ function Gate() {
   const system = useColorScheme();
   const C = (theme === 'auto' ? system === 'light' : theme === 'light') ? LIGHT : DARK;
   const [fonts] = useFonts({
-    BarlowCondensed_400Regular, BarlowCondensed_500Medium, BarlowCondensed_600SemiBold, BarlowCondensed_700Bold,
+    Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Anton_400Regular,
     Oswald_500Medium, Oswald_600SemiBold,
   });
   const ok = ready && fonts;

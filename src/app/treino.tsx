@@ -215,11 +215,11 @@ function Treino() {
       </View>
       <Txt f="num" size={clockSize} color={look.color} style={{ lineHeight: clockSize * 1.12, fontVariant: ['tabular-nums'] }} adjustsFontSizeToFit numberOfLines={1}>{fmtClock(r.remaining)}</Txt>
       {theme && (s.type === 'work'
-        ? <Txt f="bold" size={landscape ? 28 : 34} caps style={{ textAlign: 'center', lineHeight: landscape ? 30 : 36 }}>{theme}</Txt>
+        ? <Txt f="title" size={landscape ? 28 : 34} caps style={{ textAlign: 'center' }}>{theme}</Txt>
         : <View style={{ alignItems: 'center', gap: landscape ? 4 : 8 }}>
             <Txt f="med" size={16} color={look.soft} caps track={0.14}>Próxima:</Txt>
             <View style={{ paddingVertical: landscape ? 4 : 8, paddingHorizontal: 18, borderWidth: 2, borderColor: 'rgba(243,241,234,.5)', borderRadius: 10 }}>
-              <Txt f="bold" size={landscape ? 22 : 26} caps style={{ textAlign: 'center' }}>{theme}</Txt>
+              <Txt f="title" size={landscape ? 22 : 26} caps style={{ textAlign: 'center' }}>{theme}</Txt>
             </View>
           </View>)}
       <Txt f="med" size={16} color={look.soft} caps track={0.14}>{counter}</Txt>
@@ -305,7 +305,7 @@ function Done({ run, onClose, landscape }: { run: Run; onClose: () => void; land
     <>
         <View style={{ gap: 4 }}>
           <Label size={15}>{WD[d.getDay()]}, {d.getDate()} {MON[d.getMonth()]} · {String(d.getHours()).padStart(2, '0')}:{String(d.getMinutes()).padStart(2, '0')}</Label>
-          <Txt f="bold" size={landscape ? 36 : 46} caps style={{ lineHeight: landscape ? 38 : 46 }}>Treino concluído.{'\n'}{who}</Txt>
+          <Txt f="title" size={landscape ? 36 : 46} caps>Treino concluído.{'\n'}{who}</Txt>
         </View>
 
         <Panel stitch style={{ gap: 18, borderRadius: 18, padding: 20 }}>

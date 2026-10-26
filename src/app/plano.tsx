@@ -14,7 +14,7 @@ import {
 } from '@/lib/plano';
 import { fmtClock } from '@/lib/sequence';
 import { useStore } from '@/lib/store';
-import { beltLook, F, useC, type Palette } from '@/lib/theme';
+import { beltLook, F, textSize, useC, type Palette } from '@/lib/theme';
 
 type BlockEdit = { index: number; block: Block };
 type DayEdit = { weekday: number | null; time: number; weekly: boolean };
@@ -22,7 +22,7 @@ type DayEdit = { weekday: number | null; time: number; weekly: boolean };
 const KINDS: BlockKind[] = ['aquecimento', 'drills', 'posicao', 'combates', 'calma'];
 const DAYS: [number | null, string][] = [[1, 'Seg'], [2, 'Ter'], [3, 'Qua'], [4, 'Qui'], [5, 'Sex'], [6, 'Sáb'], [0, 'Dom'], [null, 'Sem dia']];
 
-const input = (C: Palette, size = 20) => ({ fontFamily: F.med, fontSize: size, color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 });
+const input = (C: Palette, size = 20) => ({ fontFamily: F.med, fontSize: textSize(size), color: C.fg, backgroundColor: C.ground, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10 });
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
 // Editar um plano de treino: dia, blocos, observações. Voltar também guarda o que mudou.
@@ -123,7 +123,7 @@ export default function PlanoScreen() {
         </Pressable>
       </View>
       <TextInput value={draft.name} onChangeText={name => setDraft({ ...draft, name })} maxLength={40} placeholder="Nome do plano" placeholderTextColor={C.muted}
-        accessibilityLabel="Nome do plano" style={{ fontFamily: F.bold, fontSize: 32, color: C.fg, paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: C.line }} />
+        accessibilityLabel="Nome do plano" style={{ fontFamily: F.title, fontSize: 30, color: C.fg, paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: C.line }} />
       <Pressable accessibilityRole="button" accessibilityLabel="Escolher dia e horário" onPress={() => setDay({ weekday: draft.weekday, time: draft.time, weekly: draft.weekly })}
         style={{ flexDirection: 'row', gap: 10 }}>
         <Pill label="Dia" value={draft.weekday === null ? 'Sem dia' : `${when !== null ? dayLabel(when) : 'Já passou'} · ${clockTime(draft.time)}`} />
@@ -180,7 +180,7 @@ export default function PlanoScreen() {
       </View>
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <View style={{ flex: 1 }}><PrimaryButton label="Salvar" height={60} light={false} onPress={save} /></View>
-        <View style={{ flex: 1.6 }}><PrimaryButton label="Começar plano" height={60} icon={<IconPlay color={C.ink} size={18} />} onPress={start} /></View>
+        <View style={{ flex: 2 }}><PrimaryButton label="Começar plano" height={60} icon={<IconPlay color={C.ink} size={18} />} onPress={start} /></View>
       </View>
       {!isNew && (
         <Pressable accessibilityRole="button" onPress={remove} style={{ alignItems: 'center', padding: 10 }}>
@@ -201,7 +201,7 @@ export default function PlanoScreen() {
           <Pressable key={k} accessibilityRole="button" onPress={() => addBlock(k)}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 14, backgroundColor: C.line }}>
             <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: blockColor(k, C.dark) }} />
-            <Txt f="semi" size={20} caps style={{ flex: 1 }}>{BLOCK_NAME[k]}</Txt>
+            <Txt f="title" size={20} caps style={{ flex: 1 }}>{BLOCK_NAME[k]}</Txt>
             <Txt f="numMed" size={16} color={C.muted}>{fmtClock(blockSeconds(newBlock(k)))}</Txt>
           </Pressable>
         ))}
@@ -377,7 +377,7 @@ function BlockCard({ index, block, C, onEdit, onPositions, onAddDrill }: { index
         <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
           <Txt f="num" size={15} color={C.dark ? '#111315' : '#ffffff'}>{String(index + 1)}</Txt>
         </View>
-        <Txt f="semi" size={22} caps style={{ flex: 1 }} numberOfLines={1}>{BLOCK_NAME[block.kind]}</Txt>
+        <Txt f="title" size={22} caps style={{ flex: 1 }} numberOfLines={1}>{BLOCK_NAME[block.kind]}</Txt>
         <Txt f="numMed" size={18} color={C.muted}>{fmtClock(blockSeconds(block))}</Txt>
         <IconHandle color={C.muted} />
       </View>
