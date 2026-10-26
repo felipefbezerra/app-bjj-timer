@@ -2,7 +2,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
-import { IconBack, IconHandle, IconPlay } from '@/components/icons';
+import { ShareSheet } from '@/components/compartilhar';
+import { IconBack, IconHandle, IconPlay, IconShare } from '@/components/icons';
 import { PlanBar, startPlan } from '@/components/plano';
 import { PositionsSheet } from '@/components/positions';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
@@ -40,6 +41,7 @@ export default function PlanoScreen() {
   const [times, setTimes] = useState<{ prep: number; change: number } | null>(null);
   const [picking, setPicking] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [sharing, setSharing] = useState<Plan | null>(null);
 
   // Ao sair da tela (voltar, gesto ou botão do Android), guarda se algo mudou.
   const draftRef = useRef(draft);
@@ -114,7 +116,11 @@ export default function PlanoScreen() {
     <View style={{ paddingHorizontal: 20, paddingTop: 14, gap: 12 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         <IconButton label="Voltar" onPress={back}><IconBack color={C.fg} /></IconButton>
-        <Label size={15}>Plano de treino</Label>
+        <View style={{ flex: 1 }}><Label size={15}>{draft.from ? `Plano de ${draft.from.name}` : 'Plano de treino'}</Label></View>
+        <Pressable accessibilityRole="button" accessibilityLabel="Compartilhar plano" onPress={() => setSharing(persist())} hitSlop={6}
+          style={({ pressed }) => ({ width: 44, height: 44, borderRadius: 22, backgroundColor: b.accent, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
+          <IconShare color={b.ink} />
+        </Pressable>
       </View>
       <TextInput value={draft.name} onChangeText={name => setDraft({ ...draft, name })} maxLength={40} placeholder="Nome do plano" placeholderTextColor={C.muted}
         accessibilityLabel="Nome do plano" style={{ fontFamily: F.bold, fontSize: 32, color: C.fg, paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: C.line }} />
@@ -296,6 +302,8 @@ export default function PlanoScreen() {
           <Stepper label="Troca entre blocos" color={C.cycle} value={fmtClock(times.change)} onMinus={() => setTimes({ ...times, change: Math.max(0, times.change - 15) })} onPlus={() => setTimes({ ...times, change: clamp(times.change + 15, 0, 600) })} />
         </>}
       </Sheet>
+
+      {sharing && <ShareSheet plan={sharing} onClose={() => setSharing(null)} />}
 
       {picking !== null && draft.blocks[picking]?.kind === 'posicao' && (() => {
         const pb = draft.blocks[picking] as Extract<Block, { kind: 'posicao' }>;

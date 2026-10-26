@@ -37,6 +37,7 @@ function Gate() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.ground } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="plano" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="receber" options={{ animation: 'slide_from_bottom' }} />
         <Stack.Screen name="treino" options={{ presentation: 'fullScreenModal', gestureEnabled: false, animation: 'fade', contentStyle: { backgroundColor: DARK.ground } }} />
       </Stack>
     </ThemeCtx.Provider>
