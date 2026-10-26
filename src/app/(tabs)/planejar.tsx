@@ -1,6 +1,8 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { ImportSheet } from '@/components/compartilhar';
 import { IconPlay } from '@/components/icons';
 import { PlanBar, startPlan } from '@/components/plano';
 import { Label, Panel, PrimaryButton, Screen, Split, Txt, useWide } from '@/components/ui';
@@ -19,6 +21,7 @@ export default function Planejar() {
   const C = useC();
   const b = beltLook(st.profile.belt, C);
   const wide = useWide();
+  const [importing, setImporting] = useState(false);
   const now = new Date();
   const next = st.plans.length ? pickNext(st.plans, now) : undefined;
   const others = st.plans.filter(p => p !== next).sort((a, z) => (nextAt(a, now) ?? Infinity) - (nextAt(z, now) ?? Infinity) || z.updated - a.updated);
@@ -60,7 +63,7 @@ export default function Planejar() {
     <View style={{ paddingHorizontal: 20 }}>
       <Panel stitch style={{ borderRadius: 18, padding: 18, gap: 10 }}>
         <Txt f="bold" size={26} caps>Nenhum plano ainda</Txt>
-        <Txt f="reg" size={17} color={C.soft}>Monte a aula em blocos: aquecimento, drills, posição específica, combates e volta à calma. O app calcula o tempo total e roda tudo em sequência, falando cada drill e posição.</Txt>
+        <Txt f="reg" size={17} color={C.soft}>Monte a aula em blocos: aquecimento, drills, posição específica, combates e volta à calma. O app calcula o tempo total e roda tudo em sequência, falando cada drill e posição. Recebeu um plano? Toque em “Importar”.</Txt>
       </Panel>
     </View>
   );
@@ -87,16 +90,21 @@ export default function Planejar() {
           </Pressable>
         );
       })}
-      <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/plano', params: { id: 'novo' } })}
-        style={{ padding: 16, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', borderColor: C.line2, alignItems: 'center' }}>
-        <Txt f="semi" size={18} color={b.accent} caps track={0.1}>+ Novo plano</Txt>
-      </Pressable>
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        {([['+ Novo plano', () => router.push({ pathname: '/plano', params: { id: 'novo' } })], ['↓ Importar', () => setImporting(true)]] as const).map(([t, fn]) => (
+          <Pressable key={t} accessibilityRole="button" onPress={fn}
+            style={{ flex: 1, padding: 16, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', borderColor: C.line2, alignItems: 'center' }}>
+            <Txt f="semi" size={18} color={b.accent} caps track={0.1}>{t}</Txt>
+          </Pressable>
+        ))}
+      </View>
     </View>
   );
 
   return (
     <Screen>
       <Split left={<>{header}{nextCard}</>} right={list} />
+      {importing && <ImportSheet onClose={() => setImporting(false)} onImported={() => setImporting(false)} />}
     </Screen>
   );
 }

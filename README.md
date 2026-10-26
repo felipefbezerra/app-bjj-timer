@@ -12,6 +12,7 @@ Roda em Android e iPhone com o mesmo código. **App em construção**, ainda nã
 - **Cronômetro**: com voltas.
 - **Planejar**: monte a aula inteira em blocos (aquecimento, drills, posição específica, combates e volta à calma), com dia, horário e repetição semanal.
   O app calcula o tempo total, roda tudo em sequência falando cada drill e posição e, no fim, mostra o planejado x feito para corrigir e salvar nos treinos.
+  Dá para **compartilhar** o plano com outro professor: por link (quem recebe toca e o plano entra nos planos dele), em PDF para imprimir (com QR code para importar) ou como arquivo. Em Planejar › Importar, cola-se o link ou abre-se o arquivo.
 - **Treinos**: perfil (nome, faixa, graus), meta da semana, sequência, calendário do mês e últimos treinos.
   Dá para registrar à mão um treino feito sem o app (aula, rola, drill, circuito, competição) e excluir qualquer treino tocando nele.
 - **Treino em andamento**: a cor e o tecido mudam por fase, a faixa enche conforme as voltas, voz em português, bipes e vibração.

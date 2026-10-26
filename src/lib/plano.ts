@@ -1,4 +1,5 @@
-import { pickThemes, type Phase } from './sequence';
+import { fmtClock, pickThemes, type Phase } from './sequence';
+import { type BeltKey } from './theme';
 
 // Plano de treino: a aula inteira montada em blocos, que o temporizador roda em sequência.
 
@@ -10,6 +11,9 @@ export type Block =
   | { kind: 'drills'; items: DrillItem[]; rest: number }
   | { kind: 'posicao'; rounds: number; work: number; rest: number; order: 'seq' | 'rand'; themes: string[] }
   | { kind: 'combates'; rounds: number; work: number; rest: number };
+
+// Quem montou o plano, quando ele veio de outra pessoa.
+export type From = { name: string; belt: BeltKey };
 
 export type Plan = {
   id: string;
@@ -23,6 +27,7 @@ export type Plan = {
   blocks: Block[];
   notes: string;
   updated: number;
+  from?: From;
 };
 
 export const BLOCK_NAME: Record<BlockKind, string> = {
@@ -92,6 +97,16 @@ export function blockChip(b: Block) {
     case 'posicao': return `Posição ${b.rounds}×${mins(b.work)}`;
     case 'combates': return `${b.rounds} ${b.rounds === 1 ? 'combate' : 'combates'}`;
     default: return BLOCK_NAME[b.kind];
+  }
+}
+
+// O que tem dentro do bloco, numa linha: notas, drills, posições ou tempos.
+export function blockDetail(b: Block) {
+  switch (b.kind) {
+    case 'aquecimento': case 'calma': return b.note;
+    case 'drills': return b.items.map(x => x.name).join(', ');
+    case 'posicao': return [`${b.rounds} × ${fmtClock(b.work)}`, b.themes.join(', ')].filter(Boolean).join(' · ');
+    case 'combates': return `${b.rounds} × ${fmtClock(b.work)} · descanso ${fmtClock(b.rest)}`;
   }
 }
 
