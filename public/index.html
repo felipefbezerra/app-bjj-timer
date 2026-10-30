@@ -8,12 +8,31 @@
     <meta name="theme-color" content="#111315" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- Barra de status opaca: com "black-translucent", o iOS 26 desenha a página uma barra mais curta
+         e deixa uma faixa preta embaixo (WebKit bug 301108). -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="BJJ Timer" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/icons/icon-192.png" type="image/png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <title>BJJ Timer</title>
+    <!-- Fontes da versão web (scripts/fonts.sh): baixadas junto com a página, antes do código do app. -->
+    <link rel="preload" href="/fonts/anton-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-500.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/oswald-500.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/oswald-600.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face { font-family: 'Anton_400Regular'; src: url(/fonts/anton-400.woff2) format('woff2'); font-display: block; }
+      @font-face { font-family: 'BarlowCondensed_400Regular'; src: url(/fonts/barlow-400.woff2) format('woff2'); font-display: block; }
+      @font-face { font-family: 'BarlowCondensed_500Medium'; src: url(/fonts/barlow-500.woff2) format('woff2'); font-display: block; }
+      @font-face { font-family: 'BarlowCondensed_600SemiBold'; src: url(/fonts/barlow-600.woff2) format('woff2'); font-display: block; }
+      @font-face { font-family: 'BarlowCondensed_700Bold'; src: url(/fonts/barlow-700.woff2) format('woff2'); font-display: block; }
+      @font-face { font-family: 'Oswald_500Medium'; src: url(/fonts/oswald-500.woff2) format('woff2'); font-display: block; }
+      @font-face { font-family: 'Oswald_600SemiBold'; src: url(/fonts/oswald-600.woff2) format('woff2'); font-display: block; }
+    </style>
     <script>
       // Fundo na cor do tema antes do app carregar, para não piscar branco.
       (function () {
@@ -21,6 +40,7 @@
         try { m = (JSON.parse(localStorage.getItem('bjj.data.v1')) || {}).theme || 'auto'; } catch (e) {}
         var light = m === 'light' || (m === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches);
         document.documentElement.style.background = light ? '#eeebe3' : '#111315';
+        document.documentElement.className = light ? 'light' : '';
       })();
     </script>
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
@@ -38,11 +58,24 @@
         height: 100%;
         flex: 1;
       }
+      /* Tela de abertura enquanto o app carrega; o app a remove quando abre. */
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #111315;
+      }
+      .light #splash { background: #eeebe3; }
+      #splash img { width: 96px; height: 96px; border-radius: 22px; }
     </style>
   </head>
 
   <body>
     <noscript>Ative o JavaScript para usar o BJJ Timer.</noscript>
+    <div id="splash"><img src="/icons/icon-192.png" alt="" /></div>
     <div id="root"></div>
     <script>
       // Versão instalável (PWA): guarda o app para abrir sem internet e se atualiza sozinho.
