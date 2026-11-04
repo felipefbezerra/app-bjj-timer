@@ -40,18 +40,31 @@ if (tts) { pickVoice(); tts.addEventListener?.('voiceschanged', pickVoice); }
 
 let silentPlay = false;
 
+// Ajustes salvos (no navegador o armazenamento é o localStorage, chave do store.tsx), lidos na hora do toque.
+function prefs(): { sound: SoundMode; silentPlay: boolean } {
+  try {
+    const d = JSON.parse(localStorage.getItem('bjj.data.v1') || '{}');
+    return { sound: d.sound ?? 'voice', silentPlay: !!d.silentPlay };
+  } catch { return { sound: 'voice', silentPlay: false }; }
+}
+
 export const Sound = {
   // Só no iPhone a chave do silencioso cala o app web; o app instalado da loja já toca nela.
   hasSilentSwitch: isIOS,
   setSilentPlay(on: boolean) { silentPlay = on; audioSession(on ? 'playback' : 'ambient'); },
   // Chamado no toque de "Começar": o navegador só libera som e voz a partir de um toque.
+  // O modo de áudio do iPhone é escolhido antes do primeiro som, e a voz só é liberada no modo Voz:
+  // no iPhone o leitor de voz pode tomar o áudio e pausar a música de outros apps.
   prime() {
+    const p = prefs();
+    Sound.setSilentPlay(p.silentPlay);
     audioContext();
+    if (p.sound !== 'voice') return;
     try { if (tts) { tts.cancel(); tts.speak(new SpeechSynthesisUtterance('')); } } catch {}
   },
   async start() { audioContext(); },
   stop() {
-    try { tts?.cancel(); } catch {}
+    try { if (tts?.speaking || tts?.pending) tts.cancel(); } catch {}
     // Fora do treino, volta a misturar com a música de outros apps.
     if (silentPlay) audioSession('ambient');
   },
