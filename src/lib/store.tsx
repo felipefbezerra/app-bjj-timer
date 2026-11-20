@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { readLegacy } from './legacy';
+import { Nuvem } from './nuvem';
+import { CAMPOS_PERFIL } from './nuvem/mesclar';
 import { type Plan } from './plano';
 import { BELTS, type BeltKey } from './theme';
 import { DEFAULT_CIRCUITO, type CircuitoConfig, type CircuitoPresetId, type CombateConfig, type Mode } from './sequence';
@@ -86,12 +88,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<Data>(DEFAULTS);
   const [ready, setReady] = useState(false);
   const loaded = useRef(false);
+  // Cópia sempre atual dos dados, para a sincronização ler e juntar sem esperar o React.
+  const ref = useRef<Data>(DEFAULTS);
+  const mudar = (fn: (d: Data) => Data) => { ref.current = fn(ref.current); setData(ref.current); };
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY).then(raw => {
-      if (raw) { try { setData(d => ({ ...d, ...JSON.parse(raw) })); } catch {} }
-      else { const old = readLegacy(); if (old) setData(d => ({ ...d, ...old })); }
+    Promise.all([AsyncStorage.getItem(KEY), Nuvem.carregar()]).then(([raw]) => {
+      let d = DEFAULTS;
+      if (raw) { try { d = { ...d, ...JSON.parse(raw) }; } catch {} }
+      else { const old = readLegacy(); if (old) d = { ...d, ...old }; }
+      ref.current = d; setData(d);
       loaded.current = true; setReady(true);
+      Nuvem.ligar({ ler: () => ref.current, aplicar: novo => mudar(() => novo) });
     });
   }, []);
 
@@ -102,11 +110,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const value = useMemo<Store>(() => ({
     ...data,
     ready,
-    set: patch => setData(d => ({ ...d, ...patch })),
-    addSession: s => setData(d => ({ ...d, history: [...d.history, s].slice(-1000) })),
-    removeSession: t => setData(d => ({ ...d, history: d.history.filter(h => h.t !== t) })),
-    savePlan: p => setData(d => ({ ...d, plans: d.plans.some(x => x.id === p.id) ? d.plans.map(x => (x.id === p.id ? p : x)) : [...d.plans, p] })),
-    removePlan: id => setData(d => ({ ...d, plans: d.plans.filter(x => x.id !== id) })),
+    set: patch => {
+      mudar(d => ({ ...d, ...patch }));
+      if (CAMPOS_PERFIL.some(k => k in patch)) Nuvem.perfilMudou();
+    },
+    addSession: s => { mudar(d => ({ ...d, history: [...d.history, s].slice(-1000) })); Nuvem.treinoNovo(s.t); },
+    removeSession: t => { mudar(d => ({ ...d, history: d.history.filter(h => h.t !== t) })); Nuvem.treinoApagado(t); },
+    savePlan: p => { mudar(d => ({ ...d, plans: d.plans.some(x => x.id === p.id) ? d.plans.map(x => (x.id === p.id ? p : x)) : [...d.plans, p] })); Nuvem.planoSalvo(p.id); },
+    removePlan: id => { mudar(d => ({ ...d, plans: d.plans.filter(x => x.id !== id) })); Nuvem.planoApagado(id); },
   }), [data, ready]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

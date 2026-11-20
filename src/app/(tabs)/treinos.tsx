@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react';
 import { Alert, Pressable, TextInput, View } from 'react-native';
 
 import { Belt } from '@/components/belt';
+import { ContaLinha, ContaSheet } from '@/components/conta';
 import { Sheet, SheetActions, Stepper } from '@/components/sheet';
 import { Label, Panel, PrimaryButton, Screen, Split, Txt, useWide } from '@/components/ui';
+import { Nuvem } from '@/lib/nuvem';
 import { blockColor } from '@/lib/plano';
 import { Sound } from '@/lib/sound';
 import { useStore, type Profile, type Session, type SoundMode, type ThemeMode } from '@/lib/store';
@@ -31,6 +33,7 @@ export default function Treinos() {
   const b = beltLook(st.profile.belt, C);
   const [profile, setProfile] = useState<(Profile & { goal: number }) | null>(null);
   const [settings, setSettings] = useState(false);
+  const [conta, setConta] = useState(false);
   const [view, setView] = useState(() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() }; });
   const [draft, setDraft] = useState<Draft | null>(null);
   const [open, setOpen] = useState<{ s: Session; confirm: boolean } | null>(null);
@@ -180,6 +183,7 @@ export default function Treinos() {
             })}
           </View>
 
+          {Nuvem.ligada && <ContaLinha onPress={() => setConta(true)} />}
           <Pressable accessibilityRole="button" onPress={() => setSettings(true)}
             style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 18, borderRadius: 16, backgroundColor: C.panel }}>
             <View><Txt f="semi" size={20} caps>Ajustes</Txt><Txt f="med" size={14} color={C.muted} caps>Som, voz e meta semanal</Txt></View>
@@ -219,6 +223,8 @@ export default function Treinos() {
           <Stepper label="Meta de treinos por semana" value={String(profile.goal)} onMinus={() => setProfile({ ...profile, goal: Math.max(1, profile.goal - 1) })} onPlus={() => setProfile({ ...profile, goal: Math.min(14, profile.goal + 1) })} />
         </>}
       </Sheet>
+
+      <ContaSheet open={conta} onClose={() => setConta(false)} />
 
       <Sheet open={settings} title="Ajustes" onClose={() => setSettings(false)}
         actions={<PrimaryButton label="Pronto" height={52} onPress={() => setSettings(false)} />}>
