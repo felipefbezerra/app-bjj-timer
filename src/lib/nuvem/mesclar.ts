@@ -77,18 +77,23 @@ export function mesclar<D extends Dados>(local: D, remoto: Remoto, pend: Pendent
 }
 
 // O que precisa subir para a conta.
+// Uma linha por chave (vale a última): o Postgres recusa o envio inteiro se a mesma chave aparece duas vezes.
+function ultimaPorChave<T, K>(linhas: T[], chave: (r: T) => K): T[] {
+  return [...new Map(linhas.map(r => [chave(r), r] as [K, T])).values()];
+}
+
 export function paraEnviar(local: Dados, pend: Pendente, perfilEm: number, agora: number) {
   const perfil = pend.perfil ? { ...Object.fromEntries(CAMPOS_PERFIL.map(k => [k, local[k]])), em: perfilEm } : null;
   const hist = new Map(local.history.map(h => [h.t, h]));
-  const treinos = [
-    ...pend.treinos.filter(t => hist.has(t)).map(t => ({ t, dados: hist.get(t)!, apagado: false })),
-    ...pend.treinosApagados.map(t => ({ t, dados: {}, apagado: true })),
-  ];
+  const treinos = ultimaPorChave([
+    ...pend.treinos.filter(t => hist.has(t)).map(t => ({ t, dados: hist.get(t)! as object, apagado: false })),
+    ...pend.treinosApagados.map(t => ({ t, dados: {} as object, apagado: true })),
+  ], r => r.t);
   const planosMap = new Map(local.plans.map(x => [x.id, x]));
-  const planos = [
-    ...pend.planos.filter(id => planosMap.has(id)).map(id => ({ id, dados: planosMap.get(id)!, apagado: false })),
-    ...pend.planosApagados.map(id => ({ id, dados: { updated: agora }, apagado: true })),
-  ];
+  const planos = ultimaPorChave([
+    ...pend.planos.filter(id => planosMap.has(id)).map(id => ({ id, dados: planosMap.get(id)! as object, apagado: false })),
+    ...pend.planosApagados.map(id => ({ id, dados: { updated: agora } as object, apagado: true })),
+  ], r => r.id);
   return { perfil, treinos, planos };
 }
 

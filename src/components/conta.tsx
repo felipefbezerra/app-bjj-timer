@@ -121,6 +121,7 @@ export function ContaSheet({ open, onClose }: { open: boolean; onClose: () => vo
         </View>
         <Txt f="reg" size={16} color={C.soft}>Seus treinos, planos e perfil ficam guardados na nuvem e aparecem em qualquer aparelho em que você entrar com este e-mail. Sem internet, o app segue normal e sincroniza depois.</Txt>
         {msg && <Aviso texto={msg.texto} erro={msg.erro} />}
+        {!excluir && !msg && conta.status === 'erro' && conta.erro && <Aviso erro texto={`Não sincronizou. ${conta.erro}`} />}
         {!excluir && <>
           {conta.status === 'sincronizando'
             ? <View style={{ height: 52, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={C.fg} /></View>

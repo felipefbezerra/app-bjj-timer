@@ -18,6 +18,8 @@ export type EstadoConta = {
   ultima: number;
   // Chegou pelo link de trocar senha do e-mail.
   recuperacao: boolean;
+  // Motivo da última falha da sincronização (status 'erro').
+  erro: string | null;
 };
 
 // Ligação com o store.tsx: ler o estado atual e aplicar uma mudança vinda da nuvem.
@@ -29,7 +31,7 @@ const VAZIO: Sync = { user: null, email: null, desde: null, pend: NADA_PENDENTE,
 
 let sync: Sync = VAZIO;
 let ponte: Ponte<Dados> | null = null;
-let estado: EstadoConta = { email: null, status: 'fora', ultima: 0, recuperacao: false };
+let estado: EstadoConta = { email: null, status: 'fora', ultima: 0, recuperacao: false, erro: null };
 const ouvintes = new Set<() => void>();
 
 function mudarEstado(patch: Partial<EstadoConta>) {
@@ -74,6 +76,17 @@ function mensagem(e: unknown): string {
   if (err?.name === 'AuthRetryableFetchError' || /fetch|network/i.test(msg)) return 'Sem internet agora. Tente de novo quando tiver sinal.';
   return 'Não deu certo agora. Tente de novo em instantes.';
 }
+// Por que a sincronização falhou, para mostrar na folha da conta.
+function motivoSync(e: unknown): string {
+  const err = e as { code?: string; message?: string; status?: number };
+  const code = err?.code ?? '';
+  const msg = err?.message ?? '';
+  if (code === '42501' || /permission denied/i.test(msg)) return 'O banco recusou o acesso às tabelas. Falta liberar a permissão no Supabase (supabase/migrations/0002_permissoes.sql).';
+  if (code === 'PGRST205' || code === '42P01' || /could not find the table|does not exist/i.test(msg)) return 'As tabelas não existem no Supabase. Rode o supabase/migrations/0001_inicial.sql.';
+  if (code === 'PGRST301' || code === 'PGRST303' || err?.status === 401 || /jwt/i.test(msg)) return 'Sua sessão expirou. Saia da conta e entre de novo.';
+  return msg ? `Erro do servidor: ${msg}${code ? ` (${code})` : ''}` : 'Erro desconhecido do servidor.';
+}
+
 export type Resultado = { ok: true; aviso?: string } | { ok: false; erro: string };
 
 function associar(user: string, email: string | null) {
@@ -81,13 +94,13 @@ function associar(user: string, email: string | null) {
   if (sync.user !== user) sync = { ...VAZIO, user, email, pend: ponte ? tudoPendente(ponte.ler()) : NADA_PENDENTE };
   else sync = { ...sync, email };
   salvarSync();
-  mudarEstado({ email, status: 'sincronizando' });
+  mudarEstado({ email, status: 'sincronizando', erro: null });
 }
 
 function esquecer() {
   sync = VAZIO;
   salvarSync();
-  mudarEstado({ email: null, status: 'fora', ultima: 0, recuperacao: false });
+  mudarEstado({ email: null, status: 'fora', ultima: 0, recuperacao: false, erro: null });
 }
 
 // ---------- Sincronização ----------
@@ -162,10 +175,11 @@ export async function sincronizar(): Promise<void> {
 
     sync = { ...sync, pend: enviado(sync.pend, foi, versoes, ponte.ler().plans), desde: maxVisto || sync.desde, ultima: Date.now() };
     salvarSync();
-    mudarEstado({ status: 'ok', ultima: sync.ultima, email: sync.email });
+    mudarEstado({ status: 'ok', ultima: sync.ultima, email: sync.email, erro: null });
   } catch (e) {
     const off = /fetch|network/i.test((e as Error)?.message ?? '') || (e as { name?: string })?.name === 'AuthRetryableFetchError';
-    mudarEstado({ status: off ? 'offline' : 'erro' });
+    if (!off) console.warn('[nuvem] sincronização falhou', e);
+    mudarEstado({ status: off ? 'offline' : 'erro', erro: off ? null : motivoSync(e) });
     salvarSync();
   } finally {
     rodando = false;
@@ -195,7 +209,7 @@ export const Nuvem = {
 
   // Marcações feitas pelo store.tsx a cada mudança.
   perfilMudou() { if (!sync.user) return; sync.pend = { ...sync.pend, perfil: sync.pend.perfil + 1 }; sync.perfilEm = Date.now(); salvarSync(); agendar(); },
-  treinoNovo(t: number) { if (!sync.user) return; sync.pend = { ...sync.pend, treinos: [...sync.pend.treinos, t] }; salvarSync(); agendar(); },
+  treinoNovo(t: number) { if (!sync.user) return; if (!sync.pend.treinos.includes(t)) sync.pend = { ...sync.pend, treinos: [...sync.pend.treinos, t] }; salvarSync(); agendar(); },
   treinoApagado(t: number) {
     if (!sync.user) return;
     sync.pend = { ...sync.pend, treinos: sync.pend.treinos.filter(x => x !== t), treinosApagados: [...sync.pend.treinosApagados, t] };
