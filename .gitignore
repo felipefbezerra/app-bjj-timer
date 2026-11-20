@@ -32,6 +32,8 @@ yarn-error.*
 
 # local env files
 .env*.local
+# chaves do Supabase ficam só no aparelho de quem desenvolve e nas configurações da Vercel/EAS
+.env
 
 # typescript
 *.tsbuildinfo
